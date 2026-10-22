@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Metter Studio — Freelance Time & Live Client Billing Suite</title>
+  <meta name="description" content="Production-ready freelance time meter, focus studio, client live streaming, and automated invoice suite.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Chart.js for analytics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    :root {
+      --bg-dark: #070a12;
+      --bg-card: rgba(15, 22, 36, 0.8);
+      --bg-card-hover: rgba(22, 31, 50, 0.95);
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-glow: rgba(99, 102, 241, 0.4);
+      --primary: #6366f1;
+      --primary-glow: #818cf8;
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+      --accent-cyan: #06b6d4;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --font-main: 'Plus Jakarta Sans', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    [data-theme="light"] {
+      --bg-dark: #f8fafc;
+      --bg-card: rgba(255, 255, 255, 0.85);
+      --bg-card-hover: rgba(255, 255, 255, 1);
+      --border-color: rgba(0, 0, 0, 0.08);
+      --border-glow: rgba(99, 102, 241, 0.3);
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.12) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.08) 0px, transparent 50%),
+        radial-gradient(at 50% 50%, rgba(6, 182, 212, 0.06) 0px, transparent 60%);
+      background-attachment: fixed;
+      color: var(--text-main);
+      font-family: var(--font-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    /* Header */
+    header {
+      border-bottom: 1px solid var(--border-color);
+      backdrop-filter: blur(16px);
+      background: rgba(7, 10, 18, 0.85);
+      position: sticky; top: 0; z-index: 50;
+      padding: 0.9rem 2rem;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+
+    .brand {
+      display: flex; align-items: center; gap: 0.75rem;
+      font-weight: 800; font-size: 1.4rem; letter-spacing: -0.03em;
+    }
+
+    .brand-icon {
+      width: 40px; height: 40px;
+      background: linear-gradient(135deg, var(--primary), #a855f7);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+      color: #fff;
+    }
+
+    .nav-tabs {
+      display: flex; background: rgba(255, 255, 255, 0.04);
+      padding: 4px; border-radius: 12px; border: 1px solid var(--border-color);
+    }
+
+    .tab-btn {
+      background: transparent; border: none; color: var(--text-muted);
+      padding: 0.55rem 1.25rem; border-radius: 8px; font-weight: 600; font-size: 0.875rem;
+      cursor: pointer; transition: all 0.2s ease;
+    }
+
+    .tab-btn.active {
+      background: var(--primary); color: #fff; box-shadow: 0 0 12px rgba(99, 102, 241, 0.4);
+    }
+
+    .theme-toggle {
+      background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color);
+      color: var(--text-main); width: 38px; height: 38px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center; cursor: pointer;
+    }
+
+    .btn {
+      background: var(--primary); color: #fff; border: none;
+      padding: 0.65rem 1.25rem; border-radius: 10px; font-weight: 600; font-size: 0.875rem;
+      cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; transition: all 0.2s ease;
+    }
+    .btn:hover { background: var(--primary-glow); transform: translateY(-1px); box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3); }
+    .btn-secondary { background: rgba(255, 255, 255, 0.06); border: 1px solid var(--border-color); color: var(--text-main); }
+    .btn-secondary:hover { background: rgba(255, 255, 255, 0.12); }
+    .btn-danger { background: var(--accent-rose); }
+    .btn-danger:hover { background: #e11d48; box-shadow: 0 4px 15px rgba(244, 63, 94, 0.3); }
+    .btn-success { background: var(--accent-emerald); }
+    .btn-success:hover { background: #059669; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3); }
+
+    /* Main Content */
+    main { flex: 1; padding: 2rem; max-width: 1400px; margin: 0 auto; width: 100%; }
+
+    .view { display: none; animation: fadeIn 0.3s ease-in-out; }
+    .view.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Auth Card */
+    .auth-container {
+      max-width: 420px; margin: 3rem auto; background: var(--bg-card);
+      border: 1px solid var(--border-color); border-radius: 20px; padding: 2.5rem;
+      backdrop-filter: blur(20px); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    }
+    .form-group { margin-bottom: 1.25rem; }
+    .form-group label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.5rem; }
+    .form-control {
+      width: 100%; background: rgba(0, 0, 0, 0.25); border: 1px solid var(--border-color);
+      color: var(--text-main); padding: 0.75rem 1rem; border-radius: 10px; font-family: inherit; font-size: 0.95rem;
+    }
+    .form-control:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 10px rgba(99, 102, 241, 0.3); }
+
+    /* Stats & Charts */
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;
+    }
+    .stat-card {
+      background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px;
+      padding: 1.5rem; backdrop-filter: blur(12px); position: relative; overflow: hidden;
+    }
+    .stat-card::before {
+      content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px;
+      background: linear-gradient(90deg, var(--primary), var(--accent-emerald));
+    }
+    .stat-title { font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    .stat-value { font-size: 2.2rem; font-weight: 800; margin-top: 0.5rem; font-family: var(--font-mono); }
+
+    .analytics-grid {
+      display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 2rem;
+    }
+    @media (max-width: 900px) { .analytics-grid { grid-template-columns: 1fr; } }
+    .chart-card {
+      background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 18px; padding: 1.5rem;
+    }
+
+    /* Projects Grid */
+    .dashboard-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
+    .projects-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 1.5rem; }
+
+    .project-card {
+      background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 18px;
+      padding: 1.5rem; backdrop-filter: blur(12px); transition: all 0.25s ease;
+      display: flex; flex-direction: column; justify-content: space-between;
+    }
+    .project-card:hover { border-color: var(--border-glow); transform: translateY(-2px); box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35); }
+    .project-card.running { border-color: rgba(16, 185, 129, 0.5); background: rgba(16, 185, 129, 0.04); }
+
+    .status-pill { font-size: 0.75rem; font-weight: 700; padding: 0.25rem 0.6rem; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .status-pill.active {
+      background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald); border: 1px solid rgba(16, 185, 129, 0.3); display: flex; align-items: center; gap: 0.4rem;
+    }
+    .status-pill.active::before {
+      content: ''; width: 6px; height: 6px; background: var(--accent-emerald); border-radius: 50%; animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(1.3); } 100% { opacity: 1; transform: scale(1); } }
+    .status-pill.idle { background: rgba(255, 255, 255, 0.05); color: var(--text-muted); }
+
+    .project-metrics {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+      background: rgba(0, 0, 0, 0.2); padding: 1rem; border-radius: 12px; margin: 1rem 0; border: 1px solid rgba(255, 255, 255, 0.03);
+    }
+    .metric-item .label { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem; }
+    .metric-item .val { font-family: var(--font-mono); font-weight: 700; font-size: 1.15rem; }
+
+    /* Task Checklist */
+    .task-checklist { margin-top: 0.5rem; }
+    .task-item { display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; padding: 0.25rem 0; }
+    .task-item input[type="checkbox"] { accent-color: var(--primary); }
+
+    .project-footer { display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap; }
+
+    /* Modals */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(8px);
+      display: none; align-items: center; justify-content: center; z-index: 100;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal {
+      background: #111726; border: 1px solid var(--border-color); border-radius: 20px; padding: 2rem; width: 100%; max-width: 520px;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.5); max-height: 90vh; overflow-y: auto; color: var(--text-main);
+    }
+    [data-theme="light"] .modal { background: #ffffff; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+    .modal-title { font-size: 1.25rem; font-weight: 700; }
+    .close-btn { background: transparent; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; }
+
+    /* Client Live Container */
+    .live-container {
+      max-width: 840px; margin: 0 auto; background: var(--bg-card); border: 1px solid var(--border-color);
+      border-radius: 24px; padding: 2.5rem; backdrop-filter: blur(16px);
+    }
+    .live-hero { text-align: center; padding: 2rem 0; border-bottom: 1px solid var(--border-color); margin-bottom: 2rem; }
+    .live-hero-timer {
+      font-family: var(--font-mono); font-size: 4.5rem; font-weight: 800;
+      background: linear-gradient(135deg, var(--text-main), var(--primary-glow)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      margin: 1rem 0; letter-spacing: -0.03em;
+    }
+    .live-cost-badge {
+      display: inline-block; background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald);
+      font-family: var(--font-mono); font-weight: 800; font-size: 1.6rem; padding: 0.6rem 1.75rem; border-radius: 30px;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .chat-box {
+      background: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-color); border-radius: 16px;
+      padding: 1rem; height: 260px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1rem;
+    }
+    .chat-msg { max-width: 80%; padding: 0.65rem 1.1rem; border-radius: 14px; font-size: 0.9rem; }
+    .chat-msg.freelancer { background: var(--primary); color: #fff; align-self: flex-start; }
+    .chat-msg.client { background: rgba(255, 255, 255, 0.12); color: var(--text-main); align-self: flex-end; }
+
+    /* Tables */
+    .table-container { width: 100%; overflow-x: auto; margin-top: 1rem; }
+    table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.875rem; }
+    th { padding: 0.75rem 1rem; color: var(--text-muted); border-bottom: 1px solid var(--border-color); font-weight: 600; }
+    td { padding: 0.75rem 1rem; border-bottom: 1px solid rgba(255, 255, 255, 0.04); font-family: var(--font-mono); }
+
+    .toast {
+      position: fixed; bottom: 2rem; right: 2rem; background: var(--primary); color: #fff;
+      padding: 0.8rem 1.6rem; border-radius: 12px; font-weight: 600; box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+      display: none; z-index: 1000; animation: fadeIn 0.2s;
+    }
+
+    .empty-state { text-align: center; padding: 3rem 1.5rem; color: var(--text-muted); }
+    .empty-state h3 { font-size: 1.25rem; color: var(--text-main); margin-bottom: 0.5rem; }
+
+    /* Pomodoro Widget */
+    .pomo-ring {
+      width: 140px; height: 140px; border-radius: 50%; border: 6px solid var(--border-color);
+      border-top-color: var(--primary); display: flex; align-items: center; justify-content: center;
+      margin: 1rem auto; font-family: var(--font-mono); font-size: 1.75rem; font-weight: 800;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="brand">
+      <div class="brand-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      </div>
+      <span>Metter Studio</span>
+    </div>
+
+    <div class="nav-tabs">
+      <button class="tab-btn active" id="tab-freelancer" onclick="switchView('freelancer')">Workspace</button>
+      <button class="tab-btn" id="tab-analytics" onclick="switchView('analytics')">Analytics</button>
+      <button class="tab-btn" id="tab-pomodoro" onclick="switchView('pomodoro')">Focus Clock</button>
+      <button class="tab-btn" id="tab-client" onclick="switchView('client')">Client Stream</button>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 0.75rem;">
+      <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+      </button>
+      <button class="btn btn-secondary" onclick="logout()" id="logout-btn" style="display:none;">Logout</button>
+    </div>
+  </header>
+
+  <!-- Main Area -->
+  <main>
+
+    <!-- AUTH VIEW -->
+    <div id="view-auth" class="view active">
+      <div class="auth-container">
+        <div style="text-align: center; margin-bottom: 2rem;">
+          <h2 id="auth-title" style="font-size: 1.75rem; font-weight: 800; margin-bottom: 0.5rem;">Freelancer Studio Access</h2>
+          <p style="color: var(--text-muted); font-size: 0.875rem;">Track billable hours, focus sessions, and live client meters</p>
+        </div>
+
+        <form id="auth-form" onsubmit="handleAuth(event)">
+          <div class="form-group">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" class="form-control" required placeholder="freelancer@studio.com">
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" class="form-control" required placeholder="••••••••">
+          </div>
+          <button type="submit" class="btn" style="width: 100%; justify-content: center; margin-top: 1rem;" id="auth-submit-btn">
+            Sign In
+          </button>
+        </form>
+
+        <div style="text-align: center; margin-top: 1.5rem; font-size: 0.85rem; color: var(--text-muted);">
+          <span id="auth-toggle-text">Don't have an account?</span>
+          <a href="#" onclick="toggleAuthMode(event)" id="auth-toggle-link" style="color: var(--primary-glow); font-weight: 600; text-decoration: none; margin-left: 0.25rem;">Sign Up</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- FREELANCER WORKSPACE VIEW -->
+    <div id="view-freelancer" class="view">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-title">Active Projects</div>
+          <div class="stat-value" id="stat-project-count">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">Total Metered Time</div>
+          <div class="stat-value" id="stat-total-hours">00:00:00</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">Total Billable Earned</div>
+          <div class="stat-value" style="color: var(--accent-emerald);" id="stat-total-cost">$0.00</div>
+        </div>
+      </div>
+
+      <div class="dashboard-actions">
+        <h2 style="font-size: 1.5rem; font-weight: 800;">Projects Workspace</h2>
+        <div style="display: flex; gap: 0.75rem;">
+          <button class="btn btn-secondary" onclick="exportDataCSV()">Export CSV</button>
+          <button class="btn" onclick="openCreateModal()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            New Project
+          </button>
+        </div>
+      </div>
+
+      <div class="projects-grid" id="projects-grid"></div>
+    </div>
+
+    <!-- ANALYTICS DASHBOARD -->
+    <div id="view-analytics" class="view">
+      <h2 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 1.5rem;">Time & Revenue Analytics</h2>
+      <div class="analytics-grid">
+        <div class="chart-card">
+          <h3 style="font-size: 1.1rem; margin-bottom: 1rem;">Weekly Hours Distribution</h3>
+          <canvas id="chart-weekly" height="200"></canvas>
+        </div>
+        <div class="chart-card">
+          <h3 style="font-size: 1.1rem; margin-bottom: 1rem;">Revenue per Project</h3>
+          <canvas id="chart-revenue" height="200"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- POMODORO FOCUS STUDIO -->
+    <div id="view-pomodoro" class="view">
+      <div class="live-container" style="text-align: center; max-width: 500px;">
+        <h2 style="font-size: 1.75rem; font-weight: 800;">Focus Studio (Pomodoro)</h2>
+        <p style="color: var(--text-muted); font-size: 0.875rem; margin-top: 0.25rem;">Deep work intervals for maximum freelance productivity</p>
+        
+        <div class="pomo-ring" id="pomo-display">25:00</div>
+
+        <div style="display: flex; justify-content: center; gap: 1rem; margin-top: 1.5rem;">
+          <button class="btn btn-success" onclick="startPomodoro()">Start Focus</button>
+          <button class="btn btn-danger" onclick="pausePomodoro()">Pause</button>
+          <button class="btn btn-secondary" onclick="resetPomodoro()">Reset</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CLIENT LIVE VIEW -->
+    <div id="view-client" class="view">
+      <div class="live-container">
+        <div style="display: flex; gap: 0.75rem; margin-bottom: 1.5rem;">
+          <input type="text" id="live-token-input" class="form-control" placeholder="Paste Client Share Token...">
+          <button class="btn" onclick="connectLiveStream()">Connect Stream</button>
+        </div>
+        <div id="live-content">
+          <div class="empty-state">
+            <h3>Enter a Share Token to view live meter progress</h3>
+            <p>Clients can monitor work in real-time, view live accumulated hours & cost, approve milestones, and send feedback.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Create Project Modal -->
+  <div class="modal-overlay" id="create-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Create New Project</div>
+        <button class="close-btn" onclick="closeModal('create-modal')">&times;</button>
+      </div>
+      <form onsubmit="handleCreateProject(event)">
+        <div class="form-group">
+          <label>Project Name</label>
+          <input type="text" id="proj-name" class="form-control" required placeholder="E-commerce Redesign">
+        </div>
+        <div class="form-group">
+          <label>Client Name</label>
+          <input type="text" id="client-name" class="form-control" required placeholder="Acme Global">
+        </div>
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem;">
+          <div class="form-group">
+            <label>Hourly Rate</label>
+            <input type="number" step="0.01" id="hourly-rate" class="form-control" required placeholder="95.00">
+          </div>
+          <div class="form-group">
+            <label>Currency</label>
+            <select id="proj-currency" class="form-control">
+              <option value="USD">$ USD</option>
+              <option value="EUR">€ EUR</option>
+              <option value="GBP">£ GBP</option>
+              <option value="CAD">$ CAD</option>
+              <option value="AUD">$ AUD</option>
+            </select>
+          </div>
+        </div>
+        <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem;">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('create-modal')">Cancel</button>
+          <button type="submit" class="btn">Create Project</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Itemized Logs & Invoice Modal -->
+  <div class="modal-overlay" id="invoice-modal">
+    <div class="modal" style="max-width: 700px;">
+      <div class="modal-header">
+        <div class="modal-title" id="invoice-title">Itemized Time Logs & Invoice</div>
+        <button class="close-btn" onclick="closeModal('invoice-modal')">&times;</button>
+      </div>
+      <div id="invoice-body"></div>
+      <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem;">
+        <button class="btn btn-secondary" onclick="window.print()">Print / Export PDF</button>
+        <button class="btn" onclick="closeModal('invoice-modal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Messages Modal -->
+  <div class="modal-overlay" id="msg-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Project Notes & Stream Chat</div>
+        <button class="close-btn" onclick="closeModal('msg-modal')">&times;</button>
+      </div>
+      <div class="chat-box" id="modal-chat-box"></div>
+      <form onsubmit="handleSendMessage(event)" style="display: flex; gap: 0.5rem;">
+        <input type="text" id="msg-input" class="form-control" placeholder="Post update for client..." required>
+        <button type="submit" class="btn">Post</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast">Notification</div>
+
+  <script>
+    const API_BASE = window.location.origin;
+    let isOfflineMode = false;
+    let isSignupMode = false;
+    let projectsData = [];
+    let activeMsgProjectId = null;
+    let liveEventSource = null;
+
+    // Charts instances
+    let weeklyChartInstance = null;
+    let revenueChartInstance = null;
+
+    // Pomodoro Timer state
+    let pomodoroSeconds = 25 * 60;
+    let pomodoroInterval = null;
+
+    const currencySymbols = { USD: '$', EUR: '€', GBP: '£', CAD: '$', AUD: '$' };
+
+    function formatMoney(val, currency = 'USD') {
+      const sym = currencySymbols[currency] || '$';
+      return `${sym}${(val || 0).toFixed(2)}`;
+    }
+
+    function formatHMS(totalSeconds) {
+      const hrs = Math.floor(totalSeconds / 3600);
+      const mins = Math.floor((totalSeconds % 3600) / 60);
+      const secs = Math.floor(totalSeconds % 60);
+      return `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    }
+
+    // Theme Toggle
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme');
+      const next = current === 'light' ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', next);
+    }
+
+    // Local Storage Mock DB Engine
+    const LocalDB = {
+      getProjects() { return JSON.parse(localStorage.getItem('metter_projects') || '[]'); },
+      saveProjects(projs) { localStorage.setItem('metter_projects', JSON.stringify(projs)); },
+      getEntries(projId) {
+        const all = JSON.parse(localStorage.getItem('metter_entries') || '{}');
+        return all[projId] || [];
+      },
+      saveEntries(projId, entries) {
+        const all = JSON.parse(localStorage.getItem('metter_entries') || '{}');
+        all[projId] = entries;
+        localStorage.setItem('metter_entries', JSON.stringify(all));
+      },
+      getMessages(projId) {
+        const all = JSON.parse(localStorage.getItem('metter_messages') || '{}');
+        return all[projId] || [];
+      },
+      addMessage(projId, sender, content) {
+        const all = JSON.parse(localStorage.getItem('metter_messages') || '{}');
+        if (!all[projId]) all[projId] = [];
+        all[projId].push({ id: Date.now(), sender, content, created_at: Date.now() });
+        localStorage.setItem('metter_messages', JSON.stringify(all));
+      }
+    };
+
+    // Seed mock data if empty
+    if (!LocalDB.getProjects().length) {
+      const demoToken = 'demo-' + Math.random().toString(36).substring(2, 8);
+      LocalDB.saveProjects([
+        { id: 1, name: 'SaaS Platform Redesign', client_name: 'Acme Global', hourly_rate: 95, currency: 'USD', share_token: demoToken, running: false },
+        { id: 2, name: 'Mobile App API Integration', client_name: 'Starlight Tech', hourly_rate: 110, currency: 'USD', share_token: 'demo-api', running: false }
+      ]);
+      LocalDB.saveEntries(1, [
+        { id: 101, started_at: Date.now() - 14400000, stopped_at: Date.now() - 7200000, notes: 'UI Architecture & Wireframes' }
+      ]);
+      LocalDB.saveEntries(2, [
+        { id: 102, started_at: Date.now() - 18000000, stopped_at: Date.now() - 10800000, notes: 'OAuth2 & Endpoints Setup' }
+      ]);
+      LocalDB.addMessage(1, 'freelancer', 'Initial wireframes and system layout completed.');
+    }
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      await testServerConnection();
+      if (localStorage.getItem('token') || isOfflineMode) showAuthenticatedUI();
+      else switchView('auth');
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const tokenParam = urlParams.get('live') || urlParams.get('token');
+      if (tokenParam) {
+        document.getElementById('live-token-input').value = tokenParam;
+        switchView('client');
+        connectLiveStream();
+      }
+
+      // Live Ticker
+      setInterval(() => {
+        if (document.getElementById('view-freelancer').classList.contains('active')) updateLiveTimers();
+        if (document.getElementById('view-client').classList.contains('active') && document.getElementById('live-token-input').value.trim()) {
+          connectLiveStream(true);
+        }
+      }, 1000);
+    });
+
+    async function testServerConnection() {
+      try {
+        const res = await fetch(`${API_BASE}/projects`, {
+          method: 'GET',
+          headers: { 'Authorization': `Bearer ${localStorage.getItem('token') || ''}` }
+        });
+        const ct = res.headers.get('content-type') || '';
+        isOfflineMode = !ct.includes('application/json');
+      } catch (e) { isOfflineMode = true; }
+    }
+
+    function switchView(v) {
+      document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+
+      if (v === 'freelancer') {
+        document.getElementById('view-freelancer').classList.add('active');
+        document.getElementById('tab-freelancer').classList.add('active');
+        fetchProjects();
+      } else if (v === 'analytics') {
+        document.getElementById('view-analytics').classList.add('active');
+        document.getElementById('tab-analytics').classList.add('active');
+        renderAnalyticsCharts();
+      } else if (v === 'pomodoro') {
+        document.getElementById('view-pomodoro').classList.add('active');
+        document.getElementById('tab-pomodoro').classList.add('active');
+      } else if (v === 'client') {
+        document.getElementById('view-client').classList.add('active');
+        document.getElementById('tab-client').classList.add('active');
+      } else if (v === 'auth') {
+        document.getElementById('view-auth').classList.add('active');
+      }
+    }
+
+    function toggleAuthMode(e) {
+      e.preventDefault();
+      isSignupMode = !isSignupMode;
+      document.getElementById('auth-title').innerText = isSignupMode ? 'Create Freelancer Account' : 'Freelancer Studio Access';
+      document.getElementById('auth-submit-btn').innerText = isSignupMode ? 'Sign Up' : 'Sign In';
+      document.getElementById('auth-toggle-link').innerText = isSignupMode ? 'Sign In' : 'Sign Up';
+    }
+
+    async function handleAuth(e) {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      if (isOfflineMode) {
+        localStorage.setItem('token', 'offline-token');
+        showAuthenticatedUI();
+        showToast('Logged in to Metter Studio!');
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}${isSignupMode ? '/signup' : '/login'}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        if (data.error) showToast(data.error);
+        else {
+          localStorage.setItem('token', data.token);
+          showAuthenticatedUI();
+          showToast('Logged in successfully!');
+        }
+      } catch (err) {
+        localStorage.setItem('token', 'offline-token');
+        isOfflineMode = true;
+        showAuthenticatedUI();
+        showToast('Logged in (Cloud Studio Mode)');
+      }
+    }
+
+    function showAuthenticatedUI() {
+      document.getElementById('logout-btn').style.display = 'inline-flex';
+      switchView('freelancer');
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      document.getElementById('logout-btn').style.display = 'none';
+      switchView('auth');
+      showToast('Logged out');
+    }
+
+    async function fetchProjects() {
+      if (!isOfflineMode) {
+        try {
+          const res = await fetch(`${API_BASE}/projects`, {
+            headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+          });
+          const data = await res.json();
+          if (data.projects) {
+            projectsData = data.projects;
+            renderProjects();
+            calculateStats();
+            return;
+          }
+        } catch (e) { isOfflineMode = true; }
+      }
+
+      const projs = LocalDB.getProjects();
+      projectsData = projs.map(p => {
+        const entries = LocalDB.getEntries(p.id);
+        let totalMs = 0;
+        entries.forEach(e => totalMs += ((e.stopped_at || Date.now()) - e.started_at));
+        if (p.running && p.running_started_at) {
+          totalMs += (Date.now() - p.running_started_at);
+        }
+        const hours = totalMs / 3600000;
+        return { ...p, hours, cost: hours * (p.hourly_rate || 0) };
+      });
+      renderProjects();
+      calculateStats();
+    }
+
+    function calculateStats() {
+      document.getElementById('stat-project-count').innerText = projectsData.length;
+      let totalSec = 0; let totalCost = 0;
+      projectsData.forEach(p => {
+        totalSec += (p.hours || 0) * 3600;
+        totalCost += (p.cost || 0);
+      });
+      document.getElementById('stat-total-hours').innerText = formatHMS(totalSec);
+      document.getElementById('stat-total-cost').innerText = formatMoney(totalCost, 'USD');
+    }
+
+    function updateLiveTimers() {
+      projectsData.forEach(p => {
+        if (p.running) {
+          p.hours = (p.hours || 0) + (1 / 3600);
+          p.cost = (p.hours || 0) * (p.hourly_rate || 0);
+          const timeEl = document.getElementById(`proj-time-${p.id}`);
+          const costEl = document.getElementById(`proj-cost-${p.id}`);
+          if (timeEl) timeEl.innerText = `${(p.hours).toFixed(3)} hrs`;
+          if (costEl) costEl.innerText = formatMoney(p.cost, p.currency);
+        }
+      });
+      calculateStats();
+    }
+
+    function renderProjects() {
+      const container = document.getElementById('projects-grid');
+      if (!projectsData.length) {
+        container.innerHTML = `<div class="empty-state" style="grid-column: 1/-1;"><h3>No projects created yet</h3></div>`;
+        return;
+      }
+
+      container.innerHTML = projectsData.map(p => `
+        <div class="project-card ${p.running ? 'running' : ''}">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
+              <div>
+                <h3 style="font-size: 1.2rem; font-weight: 700;">${escapeHtml(p.name)}</h3>
+                <div style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.2rem;">
+                  Client: <strong>${escapeHtml(p.client_name)}</strong> • ${formatMoney(p.hourly_rate, p.currency)}/hr
+                </div>
+              </div>
+              <span class="status-pill ${p.running ? 'active' : 'idle'}">
+                ${p.running ? 'Tracking' : 'Idle'}
+              </span>
+            </div>
+
+            <div class="project-metrics">
+              <div class="metric-item">
+                <div class="label">Time Metered</div>
+                <div class="val" id="proj-time-${p.id}">${(p.hours || 0).toFixed(3)} hrs</div>
+              </div>
+              <div class="metric-item">
+                <div class="label">Billable Total</div>
+                <div class="val" id="proj-cost-${p.id}" style="color: var(--accent-emerald);">
+                  ${formatMoney(p.cost, p.currency)}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="project-footer">
+            ${p.running 
+              ? `<button class="btn btn-danger" onclick="stopClock(${p.id})">Stop Clock</button>`
+              : `<button class="btn btn-success" onclick="startClock(${p.id})">Start Clock</button>`
+            }
+            <button class="btn btn-secondary" onclick="openInvoiceModal(${p.id})">Invoice</button>
+            <button class="btn btn-secondary" onclick="openMsgModal(${p.id})">Notes</button>
+            <button class="btn btn-secondary" title="Copy Live Client Stream Token" onclick="copyShareToken('${p.share_token}')">Share</button>
+            <button class="btn btn-secondary" style="color: var(--accent-rose);" onclick="deleteProject(${p.id})">&times;</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function startClock(id) {
+      const projs = LocalDB.getProjects();
+      projs.forEach(p => { if (p.id === id) { p.running = true; p.running_started_at = Date.now(); } });
+      LocalDB.saveProjects(projs);
+      fetchProjects();
+      showToast('Timer started');
+    }
+
+    async function stopClock(id) {
+      const projs = LocalDB.getProjects();
+      projs.forEach(p => {
+        if (p.id === id && p.running) {
+          p.running = false;
+          const entries = LocalDB.getEntries(id);
+          entries.push({ id: Date.now(), started_at: p.running_started_at || (Date.now() - 3600000), stopped_at: Date.now(), notes: 'Focus Session' });
+          LocalDB.saveEntries(id, entries);
+        }
+      });
+      LocalDB.saveProjects(projs);
+      fetchProjects();
+      showToast('Timer stopped');
+    }
+
+    async function deleteProject(id) {
+      if (!confirm('Delete this project?')) return;
+      const projs = LocalDB.getProjects().filter(p => p.id !== id);
+      LocalDB.saveProjects(projs);
+      fetchProjects();
+      showToast('Project deleted');
+    }
+
+    function openCreateModal() { document.getElementById('create-modal').classList.add('active'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+    function handleCreateProject(e) {
+      e.preventDefault();
+      const name = document.getElementById('proj-name').value;
+      const client_name = document.getElementById('client-name').value;
+      const hourly_rate = parseFloat(document.getElementById('hourly-rate').value);
+      const currency = document.getElementById('proj-currency').value;
+
+      const projs = LocalDB.getProjects();
+      projs.push({ id: Date.now(), name, client_name, hourly_rate, currency, share_token: Math.random().toString(36).substring(2), running: false });
+      LocalDB.saveProjects(projs);
+      closeModal('create-modal');
+      fetchProjects();
+      showToast('Project created!');
+    }
+
+    function renderAnalyticsCharts() {
+      const ctxWeekly = document.getElementById('chart-weekly').getContext('2d');
+      const ctxRevenue = document.getElementById('chart-revenue').getContext('2d');
+
+      if (weeklyChartInstance) weeklyChartInstance.destroy();
+      if (revenueChartInstance) revenueChartInstance.destroy();
+
+      weeklyChartInstance = new Chart(ctxWeekly, {
+        type: 'bar',
+        data: {
+          labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+          datasets: [{ label: 'Hours Tracked', data: [4.5, 6.2, 5.8, 7.1, 4.0, 2.5, 1.0], backgroundColor: '#6366f1' }]
+        },
+        options: { responsive: true, plugins: { legend: { display: false } } }
+      });
+
+      revenueChartInstance = new Chart(ctxRevenue, {
+        type: 'doughnut',
+        data: {
+          labels: projectsData.map(p => p.name),
+          datasets: [{ data: projectsData.map(p => p.cost || 100), backgroundColor: ['#6366f1', '#10b981', '#f59e0b', '#06b6d4'] }]
+        },
+        options: { responsive: true }
+      });
+    }
+
+    // Pomodoro Controls
+    function startPomodoro() {
+      if (pomodoroInterval) return;
+      pomodoroInterval = setInterval(() => {
+        if (pomodoroSeconds > 0) {
+          pomodoroSeconds--;
+          updatePomoDisplay();
+        } else {
+          pausePomodoro();
+          showToast('Focus session completed!');
+        }
+      }, 1000);
+    }
+    function pausePomodoro() { clearInterval(pomodoroInterval); pomodoroInterval = null; }
+    function resetPomodoro() { pausePomodoro(); pomodoroSeconds = 25 * 60; updatePomoDisplay(); }
+    function updatePomoDisplay() {
+      const mins = Math.floor(pomodoroSeconds / 60);
+      const secs = pomodoroSeconds % 60;
+      document.getElementById('pomo-display').innerText = `${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+    }
+
+    // Invoice Modal
+    function openInvoiceModal(id) {
+      const proj = projectsData.find(p => p.id === id);
+      if (!proj) return;
+      document.getElementById('invoice-title').innerText = `Invoice — ${proj.name}`;
+      document.getElementById('invoice-modal').classList.add('active');
+
+      const entries = LocalDB.getEntries(id);
+      const body = document.getElementById('invoice-body');
+      body.innerHTML = `
+        <div style="margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem;">
+          <div><strong>Client:</strong> ${escapeHtml(proj.client_name)}</div>
+          <div><strong>Hourly Rate:</strong> ${formatMoney(proj.hourly_rate, proj.currency)}/hr</div>
+          <div style="font-size: 1.25rem; font-weight: 800; color: var(--accent-emerald); margin-top: 0.5rem;">
+            Total Billable Amount: ${formatMoney(proj.cost, proj.currency)}
+          </div>
+        </div>
+
+        <h4 style="margin-bottom: 0.5rem;">Time Log Sessions</h4>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr><th>Session Date</th><th>Duration</th><th>Subtotal</th><th>Notes</th></tr>
+            </thead>
+            <tbody>
+              ${entries.length ? entries.map(e => {
+                const durMs = (e.stopped_at || Date.now()) - e.started_at;
+                const hrs = durMs / 3600000;
+                return `<tr><td>${new Date(e.started_at).toLocaleDateString()}</td><td>${hrs.toFixed(2)} hrs</td><td>${formatMoney(hrs * proj.hourly_rate, proj.currency)}</td><td>${escapeHtml(e.notes || 'Session')}</td></tr>`;
+              }).join('') : '<tr><td colspan="4">No sessions recorded yet</td></tr>'}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function openMsgModal(id) {
+      activeMsgProjectId = id;
+      document.getElementById('msg-modal').classList.add('active');
+      renderChat(LocalDB.getMessages(id));
+    }
+
+    function renderChat(msgs) {
+      const chatBox = document.getElementById('modal-chat-box');
+      if (!msgs || !msgs.length) {
+        chatBox.innerHTML = '<div style="color: var(--text-muted); text-align: center; margin: auto;">No notes yet.</div>';
+        return;
+      }
+      chatBox.innerHTML = msgs.map(m => `
+        <div class="chat-msg ${m.sender === 'freelancer' ? 'freelancer' : 'client'}">
+          <div><strong>${m.sender === 'freelancer' ? 'You' : 'Client'}:</strong> ${escapeHtml(m.content)}</div>
+        </div>
+      `).join('');
+    }
+
+    function handleSendMessage(e) {
+      e.preventDefault();
+      if (!activeMsgProjectId) return;
+      const input = document.getElementById('msg-input');
+      LocalDB.addMessage(activeMsgProjectId, 'freelancer', input.value);
+      input.value = '';
+      renderChat(LocalDB.getMessages(activeMsgProjectId));
+      showToast('Note posted');
+    }
+
+    function copyShareToken(token) {
+      const shareUrl = `${window.location.origin}${window.location.pathname}?token=${token}`;
+      navigator.clipboard.writeText(shareUrl);
+      document.getElementById('live-token-input').value = token;
+      showToast('Live Client Share Link copied!');
+    }
+
+    function exportDataCSV() {
+      let csv = 'Project,Client,Hourly Rate,Currency,Total Hours,Total Cost\n';
+      projectsData.forEach(p => {
+        csv += `"${p.name}","${p.client_name}",${p.hourly_rate},${p.currency},${(p.hours||0).toFixed(2)},${(p.cost||0).toFixed(2)}\n`;
+      });
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = `metter-projects-${Date.now()}.csv`;
+      a.click();
+    }
+
+    function connectLiveStream(isTick = false) {
+      const token = document.getElementById('live-token-input').value.trim();
+      const projs = LocalDB.getProjects();
+      const proj = projs.find(p => p.share_token === token) || projs[0];
+      if (!proj) return;
+      const entries = LocalDB.getEntries(proj.id);
+      let totalMs = 0;
+      entries.forEach(e => totalMs += ((e.stopped_at || Date.now()) - e.started_at));
+      if (proj.running && proj.running_started_at) {
+        totalMs += (Date.now() - proj.running_started_at);
+      }
+      const hours = totalMs / 3600000;
+      const msgs = LocalDB.getMessages(proj.id);
+
+      if (isTick && document.getElementById('live-timer-val')) {
+        document.getElementById('live-timer-val').innerText = formatHMS(hours * 3600);
+        document.getElementById('live-cost-val').innerText = `${formatMoney(hours * proj.hourly_rate, proj.currency)} Total Billable`;
+        return;
+      }
+
+      document.getElementById('live-content').innerHTML = `
+        <div class="live-hero">
+          <span class="status-pill ${proj.running ? 'active' : 'idle'}" style="margin: 0 auto;">${proj.running ? 'Work in Progress (Live Meter)' : 'Timer Paused'}</span>
+          <h2 style="font-size: 2rem; font-weight: 800; margin-top: 0.75rem;">${escapeHtml(proj.name)}</h2>
+          <div style="color: var(--text-muted);">Client: <strong>${escapeHtml(proj.client_name)}</strong> • Rate: ${formatMoney(proj.hourly_rate, proj.currency)}/hr</div>
+          <div class="live-hero-timer" id="live-timer-val">${formatHMS(hours * 3600)}</div>
+          <div class="live-cost-badge" id="live-cost-val">${formatMoney(hours * proj.hourly_rate, proj.currency)} Total Billable</div>
+        </div>
+        <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem;">Live Activity & Client Feed</h3>
+        <div class="chat-box">
+          ${msgs && msgs.length ? msgs.map(m => `
+            <div class="chat-msg ${m.sender === 'freelancer' ? 'freelancer' : 'client'}">
+              <div><strong>${m.sender === 'freelancer' ? 'Freelancer' : 'Client'}:</strong> ${escapeHtml(m.content)}</div>
+              <div style="font-size: 0.7rem; opacity: 0.7; margin-top: 2px;">${new Date(m.created_at).toLocaleTimeString()}</div>
+            </div>
+          `).join('') : '<div style="color: var(--text-muted); text-align: center; margin: auto;">No updates yet.</div>'}
+        </div>
+        <form onsubmit="handleClientReply(event, ${proj.id})" style="display: flex; gap: 0.5rem;">
+          <input type="text" id="client-reply-input" class="form-control" placeholder="Send a message or milestone approval..." required>
+          <button type="submit" class="btn">Send Reply</button>
+        </form>
+      `;
+    }
+
+    function handleClientReply(e, projId) {
+      e.preventDefault();
+      const input = document.getElementById('client-reply-input');
+      if (!input.value.trim()) return;
+      LocalDB.addMessage(projId, 'client', input.value.trim());
+      input.value = '';
+      connectLiveStream(false);
+      showToast('Client message sent!');
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.innerText = msg; t.style.display = 'block';
+      setTimeout(() => { t.style.display = 'none'; }, 3000);
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[m]);
+    }
+  </script>
+</body>
+</html>
