@@ -68,6 +68,19 @@ db.serialize(() => {
       FOREIGN KEY(project_id) REFERENCES projects(id)
     )
   `);
+
+  db.run(`
+    CREATE TABLE IF NOT EXISTS expenses (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      project_id INTEGER,
+      amount REAL,
+      category TEXT,
+      notes TEXT,
+      reimbursable INTEGER DEFAULT 1,
+      date TEXT,
+      FOREIGN KEY(project_id) REFERENCES projects(id)
+    )
+  `);
 });
 
 // ===============================
@@ -255,6 +268,34 @@ app.post("/projects/:id/entries", auth, (req, res) => {
       res.json({ entryId: this.lastID });
     }
   );
+});
+
+// ===============================
+// EXPENSES
+// ===============================
+app.get("/projects/:id/expenses", auth, (req, res) => {
+  db.all(`SELECT * FROM expenses WHERE project_id = ? ORDER BY date DESC`, [req.params.id], (err, expenses) => {
+    res.json({ expenses: expenses || [] });
+  });
+});
+
+app.post("/projects/:id/expenses", auth, (req, res) => {
+  const { amount, category, notes, reimbursable, date } = req.body;
+  db.run(
+    `INSERT INTO expenses (project_id, amount, category, notes, reimbursable, date) VALUES (?, ?, ?, ?, ?, ?)`,
+    [req.params.id, amount, category || 'Other', notes || '', reimbursable !== false ? 1 : 0, date || new Date().toISOString()],
+    function (err) {
+      if (err) return res.json({ error: "Failed to add expense" });
+      res.json({ expenseId: this.lastID });
+    }
+  );
+});
+
+app.delete("/expenses/:id", auth, (req, res) => {
+  db.run(`DELETE FROM expenses WHERE id = ?`, [req.params.id], function (err) {
+    if (err) return res.json({ error: "Failed to delete expense" });
+    res.json({ ok: true });
+  });
 });
 
 // ===============================
