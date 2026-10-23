@@ -3,21 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Metter Studio — Freelance Time & Live Client Billing Suite</title>
-  <meta name="description" content="Production-ready freelance time meter, focus studio, client live streaming, and automated invoice suite.">
-  
+  <title>TaskMeter Studio — Freelance Time Clock & Real-Time Client Billing</title>
+  <meta name="description" content="Next-generation freelance time meter, client live stream, Pomodoro focus studio, budget caps, and automated invoice suite for taskmeter.online.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236366f1'><circle cx='12' cy='12' r='10'/><polyline points='12 6 12 12 16 14' stroke='%23ffffff' stroke-width='2.5' fill='none'/></svg>">
+
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
-  
+
   <!-- Chart.js for analytics -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
   <style>
     :root {
       --bg-dark: #070a12;
-      --bg-card: rgba(15, 22, 36, 0.8);
+      --bg-card: rgba(15, 22, 36, 0.82);
       --bg-card-hover: rgba(22, 31, 50, 0.95);
       --border-color: rgba(255, 255, 255, 0.08);
       --border-glow: rgba(99, 102, 241, 0.4);
@@ -27,15 +28,18 @@
       --accent-amber: #f59e0b;
       --accent-rose: #f43f5e;
       --accent-cyan: #06b6d4;
+      --accent-purple: #a855f7;
       --text-main: #f3f4f6;
       --text-muted: #9ca3af;
       --font-main: 'Plus Jakarta Sans', sans-serif;
       --font-mono: 'JetBrains Mono', monospace;
+      --glass-blur: blur(16px);
+      --dock-height: 72px;
     }
 
     [data-theme="light"] {
       --bg-dark: #f8fafc;
-      --bg-card: rgba(255, 255, 255, 0.85);
+      --bg-card: rgba(255, 255, 255, 0.9);
       --bg-card-hover: rgba(255, 255, 255, 1);
       --border-color: rgba(0, 0, 0, 0.08);
       --border-glow: rgba(99, 102, 241, 0.3);
@@ -48,8 +52,8 @@
     body {
       background-color: var(--bg-dark);
       background-image: 
-        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.12) 0px, transparent 50%),
-        radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.08) 0px, transparent 50%),
+        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.1) 0px, transparent 50%),
         radial-gradient(at 50% 50%, rgba(6, 182, 212, 0.06) 0px, transparent 60%);
       background-attachment: fixed;
       color: var(--text-main);
@@ -58,123 +62,176 @@
       display: flex;
       flex-direction: column;
       transition: background-color 0.3s ease, color 0.3s ease;
+      padding-bottom: var(--dock-height);
     }
+
+    /* Top Utility Bar */
+    .top-banner {
+      background: linear-gradient(90deg, rgba(99, 102, 241, 0.15), rgba(16, 185, 129, 0.15));
+      border-bottom: 1px solid var(--border-color);
+      font-size: 0.78rem;
+      padding: 0.35rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--text-muted);
+    }
+    .top-banner strong { color: var(--text-main); }
+    .top-banner a { color: var(--primary-glow); text-decoration: none; font-weight: 600; }
+    .top-banner a:hover { text-decoration: underline; }
 
     /* Header */
     header {
       border-bottom: 1px solid var(--border-color);
-      backdrop-filter: blur(16px);
+      backdrop-filter: var(--glass-blur);
       background: rgba(7, 10, 18, 0.85);
       position: sticky; top: 0; z-index: 50;
-      padding: 0.9rem 2rem;
+      padding: 0.85rem 1.75rem;
       display: flex; justify-content: space-between; align-items: center;
+      gap: 1rem;
     }
+    [data-theme="light"] header { background: rgba(255, 255, 255, 0.85); }
 
     .brand {
       display: flex; align-items: center; gap: 0.75rem;
-      font-weight: 800; font-size: 1.4rem; letter-spacing: -0.03em;
+      font-weight: 800; font-size: 1.35rem; letter-spacing: -0.03em;
+      cursor: pointer;
     }
 
     .brand-icon {
-      width: 40px; height: 40px;
-      background: linear-gradient(135deg, var(--primary), #a855f7);
-      border-radius: 12px;
+      width: 38px; height: 38px;
+      background: linear-gradient(135deg, var(--primary), var(--accent-purple));
+      border-radius: 10px;
       display: flex; align-items: center; justify-content: center;
       box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
       color: #fff;
     }
 
+    .brand-badge {
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 0.15rem 0.45rem;
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--accent-emerald);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
     .nav-tabs {
       display: flex; background: rgba(255, 255, 255, 0.04);
       padding: 4px; border-radius: 12px; border: 1px solid var(--border-color);
+      overflow-x: auto;
     }
+    [data-theme="light"] .nav-tabs { background: rgba(0, 0, 0, 0.04); }
 
     .tab-btn {
       background: transparent; border: none; color: var(--text-muted);
-      padding: 0.55rem 1.25rem; border-radius: 8px; font-weight: 600; font-size: 0.875rem;
-      cursor: pointer; transition: all 0.2s ease;
+      padding: 0.5rem 1.15rem; border-radius: 8px; font-weight: 600; font-size: 0.85rem;
+      cursor: pointer; transition: all 0.2s ease; white-space: nowrap;
+      display: flex; align-items: center; gap: 0.4rem;
     }
 
     .tab-btn.active {
       background: var(--primary); color: #fff; box-shadow: 0 0 12px rgba(99, 102, 241, 0.4);
     }
 
-    .theme-toggle {
-      background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color);
-      color: var(--text-main); width: 38px; height: 38px; border-radius: 10px;
-      display: flex; align-items: center; justify-content: center; cursor: pointer;
+    .header-actions {
+      display: flex; align-items: center; gap: 0.6rem;
     }
+
+    .icon-btn {
+      background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color);
+      color: var(--text-main); width: 36px; height: 36px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center; cursor: pointer;
+      transition: all 0.2s;
+    }
+    .icon-btn:hover { background: rgba(255, 255, 255, 0.1); transform: translateY(-1px); }
 
     .btn {
       background: var(--primary); color: #fff; border: none;
-      padding: 0.65rem 1.25rem; border-radius: 10px; font-weight: 600; font-size: 0.875rem;
-      cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; transition: all 0.2s ease;
+      padding: 0.58rem 1.15rem; border-radius: 10px; font-weight: 600; font-size: 0.85rem;
+      cursor: pointer; display: inline-flex; align-items: center; gap: 0.45rem; transition: all 0.2s ease;
+      white-space: nowrap;
     }
     .btn:hover { background: var(--primary-glow); transform: translateY(-1px); box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3); }
     .btn-secondary { background: rgba(255, 255, 255, 0.06); border: 1px solid var(--border-color); color: var(--text-main); }
+    [data-theme="light"] .btn-secondary { background: rgba(0, 0, 0, 0.04); }
     .btn-secondary:hover { background: rgba(255, 255, 255, 0.12); }
     .btn-danger { background: var(--accent-rose); }
     .btn-danger:hover { background: #e11d48; box-shadow: 0 4px 15px rgba(244, 63, 94, 0.3); }
     .btn-success { background: var(--accent-emerald); }
     .btn-success:hover { background: #059669; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3); }
+    .btn-amber { background: var(--accent-amber); color: #000; }
+    .btn-amber:hover { background: #d97706; }
+    .btn-sm { padding: 0.35rem 0.75rem; font-size: 0.78rem; border-radius: 7px; }
 
     /* Main Content */
-    main { flex: 1; padding: 2rem; max-width: 1400px; margin: 0 auto; width: 100%; }
+    main { flex: 1; padding: 1.75rem 2rem; max-width: 1400px; margin: 0 auto; width: 100%; }
 
-    .view { display: none; animation: fadeIn 0.3s ease-in-out; }
+    .view { display: none; animation: fadeIn 0.25s ease-in-out; }
     .view.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* Auth Card */
-    .auth-container {
-      max-width: 420px; margin: 3rem auto; background: var(--bg-card);
-      border: 1px solid var(--border-color); border-radius: 20px; padding: 2.5rem;
-      backdrop-filter: blur(20px); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-    }
-    .form-group { margin-bottom: 1.25rem; }
-    .form-group label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.5rem; }
-    .form-control {
-      width: 100%; background: rgba(0, 0, 0, 0.25); border: 1px solid var(--border-color);
-      color: var(--text-main); padding: 0.75rem 1rem; border-radius: 10px; font-family: inherit; font-size: 0.95rem;
-    }
-    .form-control:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 10px rgba(99, 102, 241, 0.3); }
-
-    /* Stats & Charts */
+    /* Stats Grid */
     .stats-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.25rem; margin-bottom: 2rem;
     }
     .stat-card {
       background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px;
-      padding: 1.5rem; backdrop-filter: blur(12px); position: relative; overflow: hidden;
+      padding: 1.25rem 1.5rem; backdrop-filter: var(--glass-blur); position: relative; overflow: hidden;
+      display: flex; flex-direction: column; justify-content: space-between;
     }
     .stat-card::before {
       content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px;
       background: linear-gradient(90deg, var(--primary), var(--accent-emerald));
     }
-    .stat-title { font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
-    .stat-value { font-size: 2.2rem; font-weight: 800; margin-top: 0.5rem; font-family: var(--font-mono); }
+    .stat-header { display: flex; justify-content: space-between; align-items: center; }
+    .stat-title { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    .stat-value { font-size: 2rem; font-weight: 800; margin-top: 0.4rem; font-family: var(--font-mono); }
+    .stat-sub { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem; }
 
-    .analytics-grid {
-      display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 2rem;
+    /* Dashboard Actions Bar */
+    .dashboard-actions {
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;
     }
-    @media (max-width: 900px) { .analytics-grid { grid-template-columns: 1fr; } }
-    .chart-card {
-      background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 18px; padding: 1.5rem;
+    .actions-left { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+    .actions-right { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+
+    /* Filter & Search Bar */
+    .filter-bar {
+      display: flex; gap: 0.6rem; align-items: center;
+      background: var(--bg-card); border: 1px solid var(--border-color);
+      padding: 0.4rem 0.8rem; border-radius: 12px;
+    }
+    .search-input {
+      background: transparent; border: none; color: var(--text-main); font-family: inherit; font-size: 0.85rem; outline: none; width: 180px;
     }
 
     /* Projects Grid */
-    .dashboard-actions { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
-    .projects-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 1.5rem; }
+    .projects-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(370px, 1fr)); gap: 1.5rem;
+    }
 
     .project-card {
       background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 18px;
-      padding: 1.5rem; backdrop-filter: blur(12px); transition: all 0.25s ease;
-      display: flex; flex-direction: column; justify-content: space-between;
+      padding: 1.5rem; backdrop-filter: var(--glass-blur); transition: all 0.25s ease;
+      display: flex; flex-direction: column; justify-content: space-between; position: relative;
     }
     .project-card:hover { border-color: var(--border-glow); transform: translateY(-2px); box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35); }
-    .project-card.running { border-color: rgba(16, 185, 129, 0.5); background: rgba(16, 185, 129, 0.04); }
+    .project-card.running { border-color: rgba(16, 185, 129, 0.55); background: rgba(16, 185, 129, 0.05); }
 
-    .status-pill { font-size: 0.75rem; font-weight: 700; padding: 0.25rem 0.6rem; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .project-top {
+      display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.85rem;
+    }
+    .project-title { font-size: 1.2rem; font-weight: 700; line-height: 1.3; }
+    .project-client { color: var(--text-muted); font-size: 0.85rem; margin-top: 0.25rem; }
+
+    .status-pill {
+      font-size: 0.72rem; font-weight: 700; padding: 0.25rem 0.65rem; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.05em;
+      white-space: nowrap;
+    }
     .status-pill.active {
       background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald); border: 1px solid rgba(16, 185, 129, 0.3); display: flex; align-items: center; gap: 0.4rem;
     }
@@ -182,167 +239,292 @@
       content: ''; width: 6px; height: 6px; background: var(--accent-emerald); border-radius: 50%; animation: pulse 1.5s infinite;
     }
     @keyframes pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(1.3); } 100% { opacity: 1; transform: scale(1); } }
-    .status-pill.idle { background: rgba(255, 255, 255, 0.05); color: var(--text-muted); }
+    .status-pill.idle { background: rgba(255, 255, 255, 0.06); color: var(--text-muted); }
 
     .project-metrics {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
-      background: rgba(0, 0, 0, 0.2); padding: 1rem; border-radius: 12px; margin: 1rem 0; border: 1px solid rgba(255, 255, 255, 0.03);
+      display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;
+      background: rgba(0, 0, 0, 0.22); padding: 0.9rem; border-radius: 12px; margin: 0.85rem 0; border: 1px solid rgba(255, 255, 255, 0.03);
     }
-    .metric-item .label { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem; }
+    [data-theme="light"] .project-metrics { background: rgba(0, 0, 0, 0.03); }
+    .metric-item .label { font-size: 0.72rem; color: var(--text-muted); margin-bottom: 0.2rem; text-transform: uppercase; font-weight: 600; }
     .metric-item .val { font-family: var(--font-mono); font-weight: 700; font-size: 1.15rem; }
 
-    /* Task Checklist */
-    .task-checklist { margin-top: 0.5rem; }
-    .task-item { display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; padding: 0.25rem 0; }
-    .task-item input[type="checkbox"] { accent-color: var(--primary); }
-
-    .project-footer { display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap; }
-
-    /* Modals */
-    .modal-overlay {
-      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-      background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(8px);
-      display: none; align-items: center; justify-content: center; z-index: 100;
+    /* Budget Progress Bar */
+    .budget-progress { margin: 0.5rem 0 0.85rem 0; }
+    .budget-labels { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.3rem; }
+    .progress-track {
+      height: 6px; background: rgba(255, 255, 255, 0.08); border-radius: 10px; overflow: hidden; position: relative;
     }
-    .modal-overlay.active { display: flex; }
-    .modal {
-      background: #111726; border: 1px solid var(--border-color); border-radius: 20px; padding: 2rem; width: 100%; max-width: 520px;
-      box-shadow: 0 25px 50px rgba(0,0,0,0.5); max-height: 90vh; overflow-y: auto; color: var(--text-main);
-    }
-    [data-theme="light"] .modal { background: #ffffff; }
-    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
-    .modal-title { font-size: 1.25rem; font-weight: 700; }
-    .close-btn { background: transparent; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; }
+    [data-theme="light"] .progress-track { background: rgba(0, 0, 0, 0.08); }
+    .progress-fill { height: 100%; border-radius: 10px; transition: width 0.3s ease; }
+    .progress-fill.safe { background: linear-gradient(90deg, var(--primary), var(--accent-emerald)); }
+    .progress-fill.warn { background: linear-gradient(90deg, var(--accent-amber), #ea580c); }
+    .progress-fill.danger { background: linear-gradient(90deg, #ea580c, var(--accent-rose)); }
 
-    /* Client Live Container */
+    /* Milestone Chips */
+    .milestone-preview {
+      display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.85rem; font-size: 0.75rem;
+    }
+    .milestone-chip {
+      padding: 0.2rem 0.55rem; border-radius: 6px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color);
+      display: flex; align-items: center; gap: 0.3rem; color: var(--text-muted);
+    }
+    .milestone-chip.completed { background: rgba(16, 185, 129, 0.12); border-color: rgba(16, 185, 129, 0.3); color: var(--accent-emerald); }
+
+    .project-footer { display: flex; gap: 0.45rem; margin-top: 0.5rem; flex-wrap: wrap; }
+    .project-footer .btn { flex: 1; justify-content: center; min-width: 80px; }
+
+    /* Analytics Dashboard */
+    .analytics-grid {
+      display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 2rem;
+    }
+    @media (max-width: 960px) { .analytics-grid { grid-template-columns: 1fr; } }
+    .chart-card {
+      background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 18px; padding: 1.5rem;
+      backdrop-filter: var(--glass-blur);
+    }
+
+    /* Pomodoro Focus Studio */
+    .pomo-container {
+      max-width: 650px; margin: 0 auto; background: var(--bg-card); border: 1px solid var(--border-color);
+      border-radius: 24px; padding: 2.5rem; backdrop-filter: var(--glass-blur); text-align: center;
+    }
+    .pomo-ring {
+      width: 190px; height: 190px; border-radius: 50%; border: 8px solid var(--border-color);
+      border-top-color: var(--primary); border-right-color: var(--accent-purple);
+      display: flex; align-items: center; justify-content: center; flex-direction: column;
+      margin: 1.75rem auto; font-family: var(--font-mono); font-size: 2.4rem; font-weight: 800;
+      position: relative; box-shadow: 0 0 35px rgba(99, 102, 241, 0.2);
+    }
+    .pomo-sub { font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-main); font-weight: 600; text-transform: uppercase; }
+
+    /* Client Live View */
     .live-container {
-      max-width: 840px; margin: 0 auto; background: var(--bg-card); border: 1px solid var(--border-color);
-      border-radius: 24px; padding: 2.5rem; backdrop-filter: blur(16px);
+      max-width: 900px; margin: 0 auto; background: var(--bg-card); border: 1px solid var(--border-color);
+      border-radius: 24px; padding: 2.5rem; backdrop-filter: var(--glass-blur);
     }
     .live-hero { text-align: center; padding: 2rem 0; border-bottom: 1px solid var(--border-color); margin-bottom: 2rem; }
     .live-hero-timer {
-      font-family: var(--font-mono); font-size: 4.5rem; font-weight: 800;
+      font-family: var(--font-mono); font-size: 4.8rem; font-weight: 800;
       background: linear-gradient(135deg, var(--text-main), var(--primary-glow)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
       margin: 1rem 0; letter-spacing: -0.03em;
     }
     .live-cost-badge {
       display: inline-block; background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald);
-      font-family: var(--font-mono); font-weight: 800; font-size: 1.6rem; padding: 0.6rem 1.75rem; border-radius: 30px;
-      border: 1px solid rgba(16, 185, 129, 0.3);
+      font-family: var(--font-mono); font-weight: 800; font-size: 1.75rem; padding: 0.6rem 2rem; border-radius: 40px;
+      border: 1px solid rgba(16, 185, 129, 0.35); box-shadow: 0 0 25px rgba(16, 185, 129, 0.15);
     }
 
     .chat-box {
-      background: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-color); border-radius: 16px;
+      background: rgba(0, 0, 0, 0.25); border: 1px solid var(--border-color); border-radius: 16px;
       padding: 1rem; height: 260px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1rem;
     }
+    [data-theme="light"] .chat-box { background: rgba(0, 0, 0, 0.03); }
     .chat-msg { max-width: 80%; padding: 0.65rem 1.1rem; border-radius: 14px; font-size: 0.9rem; }
     .chat-msg.freelancer { background: var(--primary); color: #fff; align-self: flex-start; }
     .chat-msg.client { background: rgba(255, 255, 255, 0.12); color: var(--text-main); align-self: flex-end; }
+    [data-theme="light"] .chat-msg.client { background: rgba(0, 0, 0, 0.08); }
+
+    /* Modals */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(0, 0, 0, 0.78); backdrop-filter: blur(8px);
+      display: none; align-items: center; justify-content: center; z-index: 100;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal {
+      background: #111726; border: 1px solid var(--border-color); border-radius: 20px; padding: 2rem; width: 100%; max-width: 540px;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.6); max-height: 90vh; overflow-y: auto; color: var(--text-main);
+    }
+    [data-theme="light"] .modal { background: #ffffff; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+    .modal-title { font-size: 1.3rem; font-weight: 700; }
+    .close-btn { background: transparent; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; }
+
+    .form-group { margin-bottom: 1.15rem; }
+    .form-group label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.45rem; }
+    .form-control {
+      width: 100%; background: rgba(0, 0, 0, 0.3); border: 1px solid var(--border-color);
+      color: var(--text-main); padding: 0.7rem 0.95rem; border-radius: 10px; font-family: inherit; font-size: 0.92rem;
+    }
+    [data-theme="light"] .form-control { background: #f8fafc; }
+    .form-control:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 10px rgba(99, 102, 241, 0.3); }
+
+    /* Floating Global Persistent Active Dock */
+    .global-timer-dock {
+      position: fixed; bottom: 0; left: 0; width: 100%; height: var(--dock-height);
+      background: rgba(10, 15, 26, 0.95); backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(16, 185, 129, 0.4);
+      display: none; align-items: center; justify-content: space-between;
+      padding: 0 2rem; z-index: 90;
+      box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.5);
+    }
+    [data-theme="light"] .global-timer-dock { background: rgba(255, 255, 255, 0.95); }
+    .global-timer-dock.active { display: flex; }
+
+    .dock-project { display: flex; align-items: center; gap: 1rem; }
+    .dock-indicator {
+      width: 12px; height: 12px; border-radius: 50%; background: var(--accent-emerald);
+      animation: pulse 1.5s infinite;
+    }
+    .dock-name { font-weight: 700; font-size: 1.05rem; }
+    .dock-client { font-size: 0.8rem; color: var(--text-muted); }
+
+    .dock-center { display: flex; align-items: center; gap: 1.5rem; }
+    .dock-timer { font-family: var(--font-mono); font-size: 2rem; font-weight: 800; color: var(--accent-emerald); }
+    .dock-cost { font-family: var(--font-mono); font-size: 1.25rem; font-weight: 700; color: var(--text-muted); }
+
+    .dock-controls { display: flex; align-items: center; gap: 0.75rem; }
 
     /* Tables */
     .table-container { width: 100%; overflow-x: auto; margin-top: 1rem; }
-    table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.875rem; }
-    th { padding: 0.75rem 1rem; color: var(--text-muted); border-bottom: 1px solid var(--border-color); font-weight: 600; }
+    table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem; }
+    th { padding: 0.75rem 1rem; color: var(--text-muted); border-bottom: 1px solid var(--border-color); font-weight: 600; text-transform: uppercase; font-size: 0.72rem; }
     td { padding: 0.75rem 1rem; border-bottom: 1px solid rgba(255, 255, 255, 0.04); font-family: var(--font-mono); }
+    [data-theme="light"] td { border-bottom: 1px solid rgba(0, 0, 0, 0.04); }
+
+    .tag-pill {
+      font-size: 0.7rem; font-weight: 700; padding: 0.2rem 0.5rem; border-radius: 6px;
+      text-transform: uppercase; display: inline-block;
+    }
+    .tag-billable { background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald); }
+    .tag-nonbillable { background: rgba(244, 63, 94, 0.15); color: var(--accent-rose); }
+
+    /* Printable Invoice Styles */
+    @media print {
+      body { background: #fff !important; color: #000 !important; padding: 0 !important; }
+      header, .top-banner, .global-timer-dock, .nav-tabs, .btn, .modal-header .close-btn, .no-print { display: none !important; }
+      .modal-overlay { position: static !important; background: transparent !important; display: block !important; }
+      .modal { max-width: 100% !important; border: none !important; box-shadow: none !important; padding: 0 !important; }
+      td, th { color: #000 !important; border-color: #ddd !important; }
+    }
 
     .toast {
-      position: fixed; bottom: 2rem; right: 2rem; background: var(--primary); color: #fff;
+      position: fixed; bottom: calc(var(--dock-height) + 1rem); right: 2rem; background: var(--primary); color: #fff;
       padding: 0.8rem 1.6rem; border-radius: 12px; font-weight: 600; box-shadow: 0 10px 25px rgba(0,0,0,0.4);
       display: none; z-index: 1000; animation: fadeIn 0.2s;
     }
 
     .empty-state { text-align: center; padding: 3rem 1.5rem; color: var(--text-muted); }
     .empty-state h3 { font-size: 1.25rem; color: var(--text-main); margin-bottom: 0.5rem; }
-
-    /* Pomodoro Widget */
-    .pomo-ring {
-      width: 140px; height: 140px; border-radius: 50%; border: 6px solid var(--border-color);
-      border-top-color: var(--primary); display: flex; align-items: center; justify-content: center;
-      margin: 1rem auto; font-family: var(--font-mono); font-size: 1.75rem; font-weight: 800;
-    }
   </style>
 </head>
 <body>
 
+  <!-- Top Announcement Bar -->
+  <div class="top-banner">
+    <div>
+      🚀 <strong>TaskMeter Studio</strong> is live on <a href="https://taskmeter.online" target="_blank">taskmeter.online</a> &amp; GitHub Pages.
+    </div>
+    <div style="display: flex; gap: 1rem; align-items: center;">
+      <span id="demo-indicator" style="cursor: pointer;" onclick="openDemoSwitcher()">⚡ Demo Mode: <strong>Active</strong> (Click to change)</span>
+      <span style="opacity: 0.7;">•</span>
+      <a href="#" onclick="openShortcutsModal(event)">Shortcuts (?)</a>
+    </div>
+  </div>
+
   <!-- Header -->
   <header>
-    <div class="brand">
+    <div class="brand" onclick="switchView('freelancer')">
       <div class="brand-icon">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
       </div>
-      <span>Metter Studio</span>
+      <div>
+        <span>TaskMeter</span>
+        <span class="brand-badge">Pro 2.0</span>
+      </div>
     </div>
 
     <div class="nav-tabs">
-      <button class="tab-btn active" id="tab-freelancer" onclick="switchView('freelancer')">Workspace</button>
-      <button class="tab-btn" id="tab-analytics" onclick="switchView('analytics')">Analytics</button>
-      <button class="tab-btn" id="tab-pomodoro" onclick="switchView('pomodoro')">Focus Clock</button>
-      <button class="tab-btn" id="tab-client" onclick="switchView('client')">Client Stream</button>
+      <button class="tab-btn active" id="tab-freelancer" onclick="switchView('freelancer')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+        Workspace
+      </button>
+      <button class="tab-btn" id="tab-analytics" onclick="switchView('analytics')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Analytics
+      </button>
+      <button class="tab-btn" id="tab-pomodoro" onclick="switchView('pomodoro')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Focus Studio
+      </button>
+      <button class="tab-btn" id="tab-invoices" onclick="switchView('invoices')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Invoices
+      </button>
+      <button class="tab-btn" id="tab-client" onclick="switchView('client')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Client Stream
+      </button>
     </div>
 
-    <div style="display: flex; align-items: center; gap: 0.75rem;">
-      <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+    <div class="header-actions">
+      <button class="icon-btn" onclick="toggleAudio()" id="audio-toggle-btn" title="Toggle Sound FX">
+        <svg id="audio-icon-on" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+      </button>
+      <button class="icon-btn" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
       </button>
-      <button class="btn btn-secondary" onclick="logout()" id="logout-btn" style="display:none;">Logout</button>
+      <button class="btn btn-secondary btn-sm" onclick="openBackupModal()">Backup/Sync</button>
     </div>
   </header>
 
   <!-- Main Area -->
   <main>
 
-    <!-- AUTH VIEW -->
-    <div id="view-auth" class="view active">
-      <div class="auth-container">
-        <div style="text-align: center; margin-bottom: 2rem;">
-          <h2 id="auth-title" style="font-size: 1.75rem; font-weight: 800; margin-bottom: 0.5rem;">Freelancer Studio Access</h2>
-          <p style="color: var(--text-muted); font-size: 0.875rem;">Track billable hours, focus sessions, and live client meters</p>
-        </div>
-
-        <form id="auth-form" onsubmit="handleAuth(event)">
-          <div class="form-group">
-            <label for="email">Email Address</label>
-            <input type="email" id="email" class="form-control" required placeholder="freelancer@studio.com">
-          </div>
-          <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" id="password" class="form-control" required placeholder="••••••••">
-          </div>
-          <button type="submit" class="btn" style="width: 100%; justify-content: center; margin-top: 1rem;" id="auth-submit-btn">
-            Sign In
-          </button>
-        </form>
-
-        <div style="text-align: center; margin-top: 1.5rem; font-size: 0.85rem; color: var(--text-muted);">
-          <span id="auth-toggle-text">Don't have an account?</span>
-          <a href="#" onclick="toggleAuthMode(event)" id="auth-toggle-link" style="color: var(--primary-glow); font-weight: 600; text-decoration: none; margin-left: 0.25rem;">Sign Up</a>
-        </div>
-      </div>
-    </div>
-
     <!-- FREELANCER WORKSPACE VIEW -->
-    <div id="view-freelancer" class="view">
+    <div id="view-freelancer" class="view active">
       <div class="stats-grid">
         <div class="stat-card">
-          <div class="stat-title">Active Projects</div>
+          <div class="stat-header">
+            <span class="stat-title">Active Projects</span>
+            <span style="font-size: 1.25rem;">📁</span>
+          </div>
           <div class="stat-value" id="stat-project-count">0</div>
+          <div class="stat-sub" id="stat-running-count">0 running right now</div>
         </div>
         <div class="stat-card">
-          <div class="stat-title">Total Metered Time</div>
+          <div class="stat-header">
+            <span class="stat-title">Total Metered Time</span>
+            <span style="font-size: 1.25rem;">⏱️</span>
+          </div>
           <div class="stat-value" id="stat-total-hours">00:00:00</div>
+          <div class="stat-sub" id="stat-billable-hours-ratio">100% billable</div>
         </div>
         <div class="stat-card">
-          <div class="stat-title">Total Billable Earned</div>
+          <div class="stat-header">
+            <span class="stat-title">Total Earned Value</span>
+            <span style="font-size: 1.25rem;">💰</span>
+          </div>
           <div class="stat-value" style="color: var(--accent-emerald);" id="stat-total-cost">$0.00</div>
+          <div class="stat-sub">Across all active contracts</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-header">
+            <span class="stat-title">Effective Hourly Rate</span>
+            <span style="font-size: 1.25rem;">⚡</span>
+          </div>
+          <div class="stat-value" style="color: var(--accent-cyan);" id="stat-avg-rate">$0.00/hr</div>
+          <div class="stat-sub">Weighted billable average</div>
         </div>
       </div>
 
       <div class="dashboard-actions">
-        <h2 style="font-size: 1.5rem; font-weight: 800;">Projects Workspace</h2>
-        <div style="display: flex; gap: 0.75rem;">
-          <button class="btn btn-secondary" onclick="exportDataCSV()">Export CSV</button>
-          <button class="btn" onclick="openCreateModal()">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <div class="actions-left">
+          <h2 style="font-size: 1.4rem; font-weight: 800;">Projects &amp; Real-Time Meters</h2>
+          <div class="filter-bar">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--text-muted);"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" class="search-input" id="project-search" placeholder="Filter projects or clients..." oninput="filterProjects()">
+          </div>
+        </div>
+        <div class="actions-right">
+          <button class="btn btn-secondary btn-sm" onclick="openManualEntryModal()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 14 14"/></svg>
+            + Manual Time
+          </button>
+          <button class="btn btn-secondary btn-sm" onclick="exportDataCSV()">Export CSV</button>
+          <button class="btn btn-sm" onclick="openCreateModal()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             New Project
           </button>
         </div>
@@ -353,31 +535,92 @@
 
     <!-- ANALYTICS DASHBOARD -->
     <div id="view-analytics" class="view">
-      <h2 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 1.5rem;">Time & Revenue Analytics</h2>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <h2 style="font-size: 1.5rem; font-weight: 800;">Time &amp; Revenue Analytics</h2>
+          <p style="color: var(--text-muted); font-size: 0.85rem;">Interactive visual breakdown of productivity, client volume, and revenue generation.</p>
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+          <button class="btn btn-secondary btn-sm" onclick="renderAnalyticsCharts('week')">This Week</button>
+          <button class="btn btn-secondary btn-sm" onclick="renderAnalyticsCharts('month')">This Month</button>
+          <button class="btn btn-secondary btn-sm" onclick="renderAnalyticsCharts('all')">All Time</button>
+        </div>
+      </div>
+
       <div class="analytics-grid">
         <div class="chart-card">
-          <h3 style="font-size: 1.1rem; margin-bottom: 1rem;">Weekly Hours Distribution</h3>
-          <canvas id="chart-weekly" height="200"></canvas>
+          <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem;">Daily Hours Metered</h3>
+          <canvas id="chart-weekly" height="220"></canvas>
         </div>
         <div class="chart-card">
-          <h3 style="font-size: 1.1rem; margin-bottom: 1rem;">Revenue per Project</h3>
-          <canvas id="chart-revenue" height="200"></canvas>
+          <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem;">Revenue Concentration by Client</h3>
+          <canvas id="chart-revenue" height="220"></canvas>
         </div>
       </div>
     </div>
 
     <!-- POMODORO FOCUS STUDIO -->
     <div id="view-pomodoro" class="view">
-      <div class="live-container" style="text-align: center; max-width: 500px;">
-        <h2 style="font-size: 1.75rem; font-weight: 800;">Focus Studio (Pomodoro)</h2>
-        <p style="color: var(--text-muted); font-size: 0.875rem; margin-top: 0.25rem;">Deep work intervals for maximum freelance productivity</p>
-        
-        <div class="pomo-ring" id="pomo-display">25:00</div>
+      <div class="pomo-container">
+        <span class="brand-badge" style="margin-bottom: 0.5rem; display: inline-block;">Deep Work Mode</span>
+        <h2 style="font-size: 1.85rem; font-weight: 800;">Focus Studio</h2>
+        <p style="color: var(--text-muted); font-size: 0.88rem; margin-top: 0.25rem;">
+          Link your Pomodoro focus blocks directly to billable project time with automatic ledger recording.
+        </p>
 
-        <div style="display: flex; justify-content: center; gap: 1rem; margin-top: 1.5rem;">
-          <button class="btn btn-success" onclick="startPomodoro()">Start Focus</button>
+        <!-- Project Association Selector -->
+        <div style="max-width: 320px; margin: 1.25rem auto 0 auto; text-align: left;">
+          <label style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Log Session to Project:</label>
+          <select id="pomo-project-select" class="form-control" style="margin-top: 0.35rem;">
+            <!-- Rendered dynamically -->
+          </select>
+        </div>
+
+        <div class="pomo-ring" id="pomo-ring">
+          <div id="pomo-display">25:00</div>
+          <div class="pomo-sub" id="pomo-mode-label">Focus Interval</div>
+        </div>
+
+        <div style="display: flex; justify-content: center; gap: 0.75rem; margin-top: 1rem; flex-wrap: wrap;">
+          <button class="btn btn-success" id="pomo-start-btn" onclick="startPomodoro()">Start Focus</button>
           <button class="btn btn-danger" onclick="pausePomodoro()">Pause</button>
           <button class="btn btn-secondary" onclick="resetPomodoro()">Reset</button>
+          <button class="btn btn-secondary" onclick="switchPomodoroMode()">Toggle Break (5m)</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- INVOICES & STATEMENTS VIEW -->
+    <div id="view-invoices" class="view">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <h2 style="font-size: 1.5rem; font-weight: 800;">Client Invoicing Studio</h2>
+          <p style="color: var(--text-muted); font-size: 0.85rem;">Generate itemized professional statements, PDF invoices, and payment receipts.</p>
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+          <button class="btn btn-secondary btn-sm" onclick="openInvoiceSettingsModal()">Business Info</button>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem;">Select Project for Invoice Generation</h3>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Project Name</th>
+                <th>Client</th>
+                <th>Hourly Rate</th>
+                <th>Logged Time</th>
+                <th>Total Billable</th>
+                <th>Budget Used</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="invoices-project-table">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
@@ -385,14 +628,15 @@
     <!-- CLIENT LIVE VIEW -->
     <div id="view-client" class="view">
       <div class="live-container">
-        <div style="display: flex; gap: 0.75rem; margin-bottom: 1.5rem;">
-          <input type="text" id="live-token-input" class="form-control" placeholder="Paste Client Share Token...">
+        <div style="display: flex; gap: 0.75rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+          <input type="text" id="live-token-input" class="form-control" style="flex: 1; min-width: 250px;" placeholder="Paste Client Share Token...">
           <button class="btn" onclick="connectLiveStream()">Connect Stream</button>
+          <button class="btn btn-secondary" onclick="loadSampleClientStream()">Load Demo Stream</button>
         </div>
         <div id="live-content">
           <div class="empty-state">
             <h3>Enter a Share Token to view live meter progress</h3>
-            <p>Clients can monitor work in real-time, view live accumulated hours & cost, approve milestones, and send feedback.</p>
+            <p>Clients can monitor work in real-time, view live accumulated hours &amp; costs, approve milestones, and send feedback.</p>
           </div>
         </div>
       </div>
@@ -400,25 +644,48 @@
 
   </main>
 
-  <!-- Create Project Modal -->
+  <!-- Global Floating Persistent Active Timer Dock -->
+  <div class="global-timer-dock" id="global-timer-dock">
+    <div class="dock-project">
+      <div class="dock-indicator"></div>
+      <div>
+        <div class="dock-name" id="dock-proj-name">Project Name</div>
+        <div class="dock-client" id="dock-proj-client">Client: Acme</div>
+      </div>
+    </div>
+
+    <div class="dock-center">
+      <div class="dock-timer" id="dock-time-val">00:00:00</div>
+      <div class="dock-cost" id="dock-cost-val">$0.00</div>
+    </div>
+
+    <div class="dock-controls">
+      <input type="text" id="dock-note-input" class="form-control" style="width: 220px; font-size: 0.8rem; padding: 0.4rem 0.7rem;" placeholder="What are you working on?">
+      <button class="btn btn-danger btn-sm" onclick="stopActiveGlobalTimer()">Stop Clock</button>
+      <button class="btn btn-secondary btn-sm" onclick="switchView('freelancer')">View Details</button>
+    </div>
+  </div>
+
+  <!-- Create / Edit Project Modal -->
   <div class="modal-overlay" id="create-modal">
     <div class="modal">
       <div class="modal-header">
-        <div class="modal-title">Create New Project</div>
+        <div class="modal-title" id="create-modal-title">Create New Project</div>
         <button class="close-btn" onclick="closeModal('create-modal')">&times;</button>
       </div>
       <form onsubmit="handleCreateProject(event)">
+        <input type="hidden" id="edit-proj-id" value="">
         <div class="form-group">
-          <label>Project Name</label>
-          <input type="text" id="proj-name" class="form-control" required placeholder="E-commerce Redesign">
+          <label>Project Name *</label>
+          <input type="text" id="proj-name" class="form-control" required placeholder="E-commerce Architecture">
         </div>
         <div class="form-group">
-          <label>Client Name</label>
-          <input type="text" id="client-name" class="form-control" required placeholder="Acme Global">
+          <label>Client Name *</label>
+          <input type="text" id="client-name" class="form-control" required placeholder="Acme Global Inc.">
         </div>
         <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem;">
           <div class="form-group">
-            <label>Hourly Rate</label>
+            <label>Hourly Rate *</label>
             <input type="number" step="0.01" id="hourly-rate" class="form-control" required placeholder="95.00">
           </div>
           <div class="form-group">
@@ -432,9 +699,55 @@
             </select>
           </div>
         </div>
+        <div class="form-group">
+          <label>Budget Cap (Hours) <span style="font-weight: 400; opacity: 0.7;">(Optional)</span></label>
+          <input type="number" step="0.5" id="proj-budget-hours" class="form-control" placeholder="e.g. 40">
+        </div>
+        <div class="form-group">
+          <label>Milestones <span style="font-weight: 400; opacity: 0.7;">(Comma-separated deliverables)</span></label>
+          <input type="text" id="proj-milestones" class="form-control" placeholder="Wireframes, Backend API, Final QA">
+        </div>
         <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem;">
           <button type="button" class="btn btn-secondary" onclick="closeModal('create-modal')">Cancel</button>
-          <button type="submit" class="btn">Create Project</button>
+          <button type="submit" class="btn" id="save-proj-btn">Save Project</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Manual Time Entry Modal -->
+  <div class="modal-overlay" id="manual-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Log Manual Time Entry</div>
+        <button class="close-btn" onclick="closeModal('manual-modal')">&times;</button>
+      </div>
+      <form onsubmit="handleManualEntry(event)">
+        <div class="form-group">
+          <label>Project</label>
+          <select id="manual-proj-select" class="form-control" required></select>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="form-group">
+            <label>Hours</label>
+            <input type="number" step="0.1" id="manual-hours" class="form-control" required placeholder="2.5">
+          </div>
+          <div class="form-group">
+            <label>Date</label>
+            <input type="date" id="manual-date" class="form-control" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Work Description / Notes</label>
+          <input type="text" id="manual-notes" class="form-control" placeholder="Sprint planning &amp; schema design">
+        </div>
+        <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem;">
+          <input type="checkbox" id="manual-billable" checked style="accent-color: var(--primary); width: 18px; height: 18px;">
+          <label for="manual-billable" style="margin-bottom: 0; cursor: pointer;">Billable to Client</label>
+        </div>
+        <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem;">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('manual-modal')">Cancel</button>
+          <button type="submit" class="btn">Add Entry</button>
         </div>
       </form>
     </div>
@@ -442,13 +755,13 @@
 
   <!-- Itemized Logs & Invoice Modal -->
   <div class="modal-overlay" id="invoice-modal">
-    <div class="modal" style="max-width: 700px;">
-      <div class="modal-header">
-        <div class="modal-title" id="invoice-title">Itemized Time Logs & Invoice</div>
+    <div class="modal" style="max-width: 780px;">
+      <div class="modal-header no-print">
+        <div class="modal-title" id="invoice-title">Itemized Time Logs &amp; Invoice</div>
         <button class="close-btn" onclick="closeModal('invoice-modal')">&times;</button>
       </div>
       <div id="invoice-body"></div>
-      <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem;">
+      <div class="no-print" style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem;">
         <button class="btn btn-secondary" onclick="window.print()">Print / Export PDF</button>
         <button class="btn" onclick="closeModal('invoice-modal')">Close</button>
       </div>
@@ -459,7 +772,7 @@
   <div class="modal-overlay" id="msg-modal">
     <div class="modal">
       <div class="modal-header">
-        <div class="modal-title">Project Notes & Stream Chat</div>
+        <div class="modal-title">Project Notes &amp; Stream Chat</div>
         <button class="close-btn" onclick="closeModal('msg-modal')">&times;</button>
       </div>
       <div class="chat-box" id="modal-chat-box"></div>
@@ -470,24 +783,93 @@
     </div>
   </div>
 
-  <!-- Toast -->
+  <!-- Business / Freelancer Profile Settings Modal -->
+  <div class="modal-overlay" id="business-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Freelancer / Agency Settings</div>
+        <button class="close-btn" onclick="closeModal('business-modal')">&times;</button>
+      </div>
+      <form onsubmit="saveBusinessProfile(event)">
+        <div class="form-group">
+          <label>Your Business / Freelancer Name</label>
+          <input type="text" id="biz-name" class="form-control" placeholder="Metter Digital Studio">
+        </div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="biz-email" class="form-control" placeholder="billing@taskmeter.online">
+        </div>
+        <div class="form-group">
+          <label>Business Address / City</label>
+          <input type="text" id="biz-address" class="form-control" placeholder="123 Tech Boulevard, Suite 400">
+        </div>
+        <div class="form-group">
+          <label>Payment Instructions / Wire / Stripe</label>
+          <input type="text" id="biz-payment" class="form-control" placeholder="ACH Wire: 987654321 / Stripe Link">
+        </div>
+        <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem;">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('business-modal')">Cancel</button>
+          <button type="submit" class="btn">Save Profile</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Backup & Restore Modal -->
+  <div class="modal-overlay" id="backup-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Backup &amp; Data Portability</div>
+        <button class="close-btn" onclick="closeModal('backup-modal')">&times;</button>
+      </div>
+      <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 1.25rem;">
+        Export all your projects, session ledgers, and milestone data to an offline JSON backup or restore from an existing file.
+      </p>
+      <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+        <button class="btn btn-secondary" onclick="downloadJSONBackup()">📥 Download Workspace Backup (.json)</button>
+        <button class="btn btn-secondary" onclick="document.getElementById('restore-file-input').click()">📤 Restore from Backup (.json)</button>
+        <input type="file" id="restore-file-input" style="display: none;" accept=".json" onchange="restoreJSONBackup(event)">
+        <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 0.5rem 0;">
+        <button class="btn btn-danger" onclick="clearAllData()">⚠️ Reset All Workspace Data</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Keyboard Shortcuts Modal -->
+  <div class="modal-overlay" id="shortcuts-modal">
+    <div class="modal" style="max-width: 440px;">
+      <div class="modal-header">
+        <div class="modal-title">Keyboard Shortcuts</div>
+        <button class="close-btn" onclick="closeModal('shortcuts-modal')">&times;</button>
+      </div>
+      <table style="font-size: 0.88rem;">
+        <tr><td style="font-weight: 700; color: var(--primary-glow);">Space</td><td>Toggle Active Clock (Play/Pause)</td></tr>
+        <tr><td style="font-weight: 700; color: var(--primary-glow);">N</td><td>Create New Project</td></tr>
+        <tr><td style="font-weight: 700; color: var(--primary-glow);">M</td><td>Log Manual Time</td></tr>
+        <tr><td style="font-weight: 700; color: var(--primary-glow);">1 - 5</td><td>Switch Nav Tabs (Workspace, Analytics, etc.)</td></tr>
+        <tr><td style="font-weight: 700; color: var(--primary-glow);">?</td><td>Open this shortcuts guide</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
   <div class="toast" id="toast">Notification</div>
 
   <script>
     const API_BASE = window.location.origin;
-    let isOfflineMode = false;
-    let isSignupMode = false;
+    let isOfflineMode = true;
     let projectsData = [];
     let activeMsgProjectId = null;
-    let liveEventSource = null;
+    let audioEnabled = true;
 
-    // Charts instances
+    // Charts
     let weeklyChartInstance = null;
     let revenueChartInstance = null;
 
     // Pomodoro Timer state
     let pomodoroSeconds = 25 * 60;
     let pomodoroInterval = null;
+    let isPomoBreak = false;
 
     const currencySymbols = { USD: '$', EUR: '€', GBP: '£', CAD: '$', AUD: '$' };
 
@@ -503,11 +885,65 @@
       return `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
     }
 
+    // Web Audio Synthesizer (Zero asset dependencies)
+    const AudioEngine = {
+      ctx: null,
+      init() {
+        if (!this.ctx && (window.AudioContext || window.webkitAudioContext)) {
+          this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+      },
+      playChime(type = 'start') {
+        if (!audioEnabled) return;
+        try {
+          this.init();
+          if (!this.ctx) return;
+          if (this.ctx.state === 'suspended') this.ctx.resume();
+
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+
+          const now = this.ctx.currentTime;
+          if (type === 'start') {
+            osc.frequency.setValueAtTime(523.25, now); // C5
+            osc.frequency.exponentialRampToValueAtTime(659.25, now + 0.15); // E5
+            gain.gain.setValueAtTime(0.15, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+            osc.start(now);
+            osc.stop(now + 0.35);
+          } else if (type === 'stop') {
+            osc.frequency.setValueAtTime(659.25, now); // E5
+            osc.frequency.exponentialRampToValueAtTime(523.25, now + 0.15); // C5
+            gain.gain.setValueAtTime(0.15, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+            osc.start(now);
+            osc.stop(now + 0.35);
+          } else if (type === 'ding') {
+            osc.frequency.setValueAtTime(880, now); // A5
+            gain.gain.setValueAtTime(0.2, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+            osc.start(now);
+            osc.stop(now + 0.5);
+          }
+        } catch (e) {}
+      }
+    };
+
+    function toggleAudio() {
+      audioEnabled = !audioEnabled;
+      document.getElementById('audio-icon-on').style.opacity = audioEnabled ? '1' : '0.35';
+      showToast(audioEnabled ? 'Sound Effects Enabled' : 'Sound Effects Muted');
+    }
+
     // Theme Toggle
     function toggleTheme() {
       const current = document.documentElement.getAttribute('data-theme');
       const next = current === 'light' ? 'dark' : 'light';
       document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('taskmeter_theme', next);
+      if (weeklyChartInstance) renderAnalyticsCharts();
     }
 
     // Local Storage Mock DB Engine
@@ -532,56 +968,106 @@
         if (!all[projId]) all[projId] = [];
         all[projId].push({ id: Date.now(), sender, content, created_at: Date.now() });
         localStorage.setItem('metter_messages', JSON.stringify(all));
+      },
+      getProfile() {
+        return JSON.parse(localStorage.getItem('metter_profile') || '{"name":"Metter Digital Agency","email":"billing@taskmeter.online","address":"77 Innovation Way, Austin TX","payment":"Wire Transfer ACH / Stripe Link"}');
+      },
+      saveProfile(prof) {
+        localStorage.setItem('metter_profile', JSON.stringify(prof));
       }
     };
 
-    // Seed mock data if empty
-    if (!LocalDB.getProjects().length) {
-      const demoToken = 'demo-' + Math.random().toString(36).substring(2, 8);
+    // Seed realistic sample data if empty
+    function seedSampleData() {
+      const demoToken1 = 'demo-' + Math.random().toString(36).substring(2, 8);
+      const demoToken2 = 'demo-' + Math.random().toString(36).substring(2, 8);
+      const demoToken3 = 'demo-' + Math.random().toString(36).substring(2, 8);
+
       LocalDB.saveProjects([
-        { id: 1, name: 'SaaS Platform Redesign', client_name: 'Acme Global', hourly_rate: 95, currency: 'USD', share_token: demoToken, running: false },
-        { id: 2, name: 'Mobile App API Integration', client_name: 'Starlight Tech', hourly_rate: 110, currency: 'USD', share_token: 'demo-api', running: false }
+        {
+          id: 1, name: 'SaaS Platform Redesign', client_name: 'Acme Global Inc.',
+          hourly_rate: 95, currency: 'USD', share_token: demoToken1, running: false,
+          budget_hours: 40, milestones: [{ name: 'UX Wireframes', completed: true }, { name: 'Full Design System', completed: true }, { name: 'React Frontend Implementation', completed: false }]
+        },
+        {
+          id: 2, name: 'Mobile API Integration', client_name: 'Starlight Tech Ltd.',
+          hourly_rate: 115, currency: 'USD', share_token: demoToken2, running: false,
+          budget_hours: 25, milestones: [{ name: 'OAuth2 Authentication', completed: true }, { name: 'Payment Webhooks', completed: false }]
+        },
+        {
+          id: 3, name: 'Cloud Infrastructure Audit', client_name: 'Venture Capital Partners',
+          hourly_rate: 140, currency: 'USD', share_token: demoToken3, running: false,
+          budget_hours: 20, milestones: [{ name: 'AWS Cost Analysis', completed: true }, { name: 'Security Review', completed: true }]
+        }
       ]);
+
+      const now = Date.now();
       LocalDB.saveEntries(1, [
-        { id: 101, started_at: Date.now() - 14400000, stopped_at: Date.now() - 7200000, notes: 'UI Architecture & Wireframes' }
+        { id: 101, started_at: now - 36000000, stopped_at: now - 28800000, notes: 'Figma Design System setup', billable: true },
+        { id: 102, started_at: now - 18000000, stopped_at: now - 10800000, notes: 'Design token export and responsive layout', billable: true }
       ]);
       LocalDB.saveEntries(2, [
-        { id: 102, started_at: Date.now() - 18000000, stopped_at: Date.now() - 10800000, notes: 'OAuth2 & Endpoints Setup' }
+        { id: 103, started_at: now - 45000000, stopped_at: now - 34200000, notes: 'Stripe webhook routing and idempotency', billable: true }
       ]);
-      LocalDB.addMessage(1, 'freelancer', 'Initial wireframes and system layout completed.');
+      LocalDB.saveEntries(3, [
+        { id: 104, started_at: now - 50000000, stopped_at: now - 42800000, notes: 'IAM Policies and VPC egress optimization', billable: true }
+      ]);
+
+      LocalDB.addMessage(1, 'freelancer', 'Design system tokens exported and verified.');
+      LocalDB.addMessage(1, 'client', 'Looks fantastic! Approved for frontend build phase.');
     }
 
-    window.addEventListener('DOMContentLoaded', async () => {
-      await testServerConnection();
-      if (localStorage.getItem('token') || isOfflineMode) showAuthenticatedUI();
-      else switchView('auth');
+    if (!LocalDB.getProjects().length) {
+      seedSampleData();
+    }
 
+    // App Initialization
+    window.addEventListener('DOMContentLoaded', async () => {
+      const savedTheme = localStorage.getItem('taskmeter_theme');
+      if (savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);
+
+      document.getElementById('manual-date').value = new Date().toISOString().split('T')[0];
+
+      // Check URL parameters
       const urlParams = new URLSearchParams(window.location.search);
       const tokenParam = urlParams.get('live') || urlParams.get('token');
       if (tokenParam) {
         document.getElementById('live-token-input').value = tokenParam;
         switchView('client');
         connectLiveStream();
+      } else {
+        fetchProjects();
       }
 
-      // Live Ticker
+      // Keyboard Shortcuts listener
+      window.addEventListener('keydown', handleGlobalKeydown);
+
+      // 1-Second Live Master Ticker
       setInterval(() => {
-        if (document.getElementById('view-freelancer').classList.contains('active')) updateLiveTimers();
-        if (document.getElementById('view-client').classList.contains('active') && document.getElementById('live-token-input').value.trim()) {
-          connectLiveStream(true);
-        }
+        updateLiveMasterTicker();
       }, 1000);
     });
 
-    async function testServerConnection() {
-      try {
-        const res = await fetch(`${API_BASE}/projects`, {
-          method: 'GET',
-          headers: { 'Authorization': `Bearer ${localStorage.getItem('token') || ''}` }
-        });
-        const ct = res.headers.get('content-type') || '';
-        isOfflineMode = !ct.includes('application/json');
-      } catch (e) { isOfflineMode = true; }
+    function handleGlobalKeydown(e) {
+      if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) return;
+
+      if (e.code === 'Space') {
+        e.preventDefault();
+        toggleRunningActiveClock();
+      } else if (e.key === 'n' || e.key === 'N') {
+        e.preventDefault();
+        openCreateModal();
+      } else if (e.key === 'm' || e.key === 'M') {
+        e.preventDefault();
+        openManualEntryModal();
+      } else if (e.key === '?') {
+        e.preventDefault();
+        openShortcutsModal();
+      } else if (e.key === '1') switchView('freelancer');
+      else if (e.key === '2') switchView('analytics');
+      else if (e.key === '3') switchView('pomodoro');
+      else if (e.key === '4') switchView('invoices');
+      else if (e.key === '5') switchView('client');
     }
 
     function switchView(v) {
@@ -599,351 +1085,691 @@
       } else if (v === 'pomodoro') {
         document.getElementById('view-pomodoro').classList.add('active');
         document.getElementById('tab-pomodoro').classList.add('active');
+        populatePomodoroProjects();
+      } else if (v === 'invoices') {
+        document.getElementById('view-invoices').classList.add('active');
+        document.getElementById('tab-invoices').classList.add('active');
+        renderInvoicesTable();
       } else if (v === 'client') {
         document.getElementById('view-client').classList.add('active');
         document.getElementById('tab-client').classList.add('active');
-      } else if (v === 'auth') {
-        document.getElementById('view-auth').classList.add('active');
       }
     }
 
-    function toggleAuthMode(e) {
-      e.preventDefault();
-      isSignupMode = !isSignupMode;
-      document.getElementById('auth-title').innerText = isSignupMode ? 'Create Freelancer Account' : 'Freelancer Studio Access';
-      document.getElementById('auth-submit-btn').innerText = isSignupMode ? 'Sign Up' : 'Sign In';
-      document.getElementById('auth-toggle-link').innerText = isSignupMode ? 'Sign In' : 'Sign Up';
-    }
-
-    async function handleAuth(e) {
-      e.preventDefault();
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-
-      if (isOfflineMode) {
-        localStorage.setItem('token', 'offline-token');
-        showAuthenticatedUI();
-        showToast('Logged in to Metter Studio!');
-        return;
-      }
-
-      try {
-        const res = await fetch(`${API_BASE}${isSignupMode ? '/signup' : '/login'}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password })
-        });
-        const data = await res.json();
-        if (data.error) showToast(data.error);
-        else {
-          localStorage.setItem('token', data.token);
-          showAuthenticatedUI();
-          showToast('Logged in successfully!');
-        }
-      } catch (err) {
-        localStorage.setItem('token', 'offline-token');
-        isOfflineMode = true;
-        showAuthenticatedUI();
-        showToast('Logged in (Cloud Studio Mode)');
-      }
-    }
-
-    function showAuthenticatedUI() {
-      document.getElementById('logout-btn').style.display = 'inline-flex';
-      switchView('freelancer');
-    }
-
-    function logout() {
-      localStorage.removeItem('token');
-      document.getElementById('logout-btn').style.display = 'none';
-      switchView('auth');
-      showToast('Logged out');
-    }
-
-    async function fetchProjects() {
-      if (!isOfflineMode) {
-        try {
-          const res = await fetch(`${API_BASE}/projects`, {
-            headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-          });
-          const data = await res.json();
-          if (data.projects) {
-            projectsData = data.projects;
-            renderProjects();
-            calculateStats();
-            return;
-          }
-        } catch (e) { isOfflineMode = true; }
-      }
-
+    // Projects Data Handler
+    function fetchProjects() {
       const projs = LocalDB.getProjects();
       projectsData = projs.map(p => {
         const entries = LocalDB.getEntries(p.id);
         let totalMs = 0;
-        entries.forEach(e => totalMs += ((e.stopped_at || Date.now()) - e.started_at));
+        let billableMs = 0;
+
+        entries.forEach(e => {
+          const duration = ((e.stopped_at || Date.now()) - e.started_at);
+          totalMs += duration;
+          if (e.billable !== false) billableMs += duration;
+        });
+
         if (p.running && p.running_started_at) {
-          totalMs += (Date.now() - p.running_started_at);
+          const runDuration = (Date.now() - p.running_started_at);
+          totalMs += runDuration;
+          billableMs += runDuration;
         }
+
         const hours = totalMs / 3600000;
-        return { ...p, hours, cost: hours * (p.hourly_rate || 0) };
+        const billableHours = billableMs / 3600000;
+        const cost = billableHours * (p.hourly_rate || 0);
+
+        return {
+          ...p,
+          hours,
+          billableHours,
+          cost,
+          entriesCount: entries.length
+        };
       });
+
       renderProjects();
       calculateStats();
+      updateGlobalTimerDock();
     }
 
     function calculateStats() {
       document.getElementById('stat-project-count').innerText = projectsData.length;
-      let totalSec = 0; let totalCost = 0;
+      let totalSec = 0;
+      let billableSec = 0;
+      let totalCost = 0;
+      let runningCount = 0;
+
       projectsData.forEach(p => {
         totalSec += (p.hours || 0) * 3600;
+        billableSec += (p.billableHours || 0) * 3600;
         totalCost += (p.cost || 0);
+        if (p.running) runningCount++;
       });
+
       document.getElementById('stat-total-hours').innerText = formatHMS(totalSec);
       document.getElementById('stat-total-cost').innerText = formatMoney(totalCost, 'USD');
+      document.getElementById('stat-running-count').innerText = `${runningCount} active timer${runningCount === 1 ? '' : 's'}`;
+
+      const ratio = totalSec > 0 ? Math.round((billableSec / totalSec) * 100) : 100;
+      document.getElementById('stat-billable-hours-ratio').innerText = `${ratio}% billable ratio`;
+
+      const totalBillableHours = billableSec / 3600;
+      const effectiveRate = totalBillableHours > 0 ? (totalCost / totalBillableHours) : 0;
+      document.getElementById('stat-avg-rate').innerText = `${formatMoney(effectiveRate, 'USD')}/hr`;
     }
 
-    function updateLiveTimers() {
+    // 1-Second Master Ticker
+    function updateLiveMasterTicker() {
+      let anyRunning = false;
+
       projectsData.forEach(p => {
         if (p.running) {
+          anyRunning = true;
           p.hours = (p.hours || 0) + (1 / 3600);
-          p.cost = (p.hours || 0) * (p.hourly_rate || 0);
+          p.billableHours = (p.billableHours || 0) + (1 / 3600);
+          p.cost = (p.billableHours || 0) * (p.hourly_rate || 0);
+
           const timeEl = document.getElementById(`proj-time-${p.id}`);
           const costEl = document.getElementById(`proj-cost-${p.id}`);
-          if (timeEl) timeEl.innerText = `${(p.hours).toFixed(3)} hrs`;
+          if (timeEl) timeEl.innerText = `${p.hours.toFixed(3)} hrs`;
           if (costEl) costEl.innerText = formatMoney(p.cost, p.currency);
+
+          // Update Budget Progress Bar in real time
+          if (p.budget_hours) {
+            updateBudgetBarUI(p);
+          }
         }
       });
-      calculateStats();
+
+      if (anyRunning) {
+        calculateStats();
+        updateGlobalTimerDock();
+      }
+
+      // If client view is open and ticking
+      if (document.getElementById('view-client').classList.contains('active') && document.getElementById('live-token-input').value.trim()) {
+        connectLiveStream(true);
+      }
     }
 
-    function renderProjects() {
-      const container = document.getElementById('projects-grid');
-      if (!projectsData.length) {
-        container.innerHTML = `<div class="empty-state" style="grid-column: 1/-1;"><h3>No projects created yet</h3></div>`;
+    function updateBudgetBarUI(p) {
+      const pct = Math.min(100, Math.round((p.hours / p.budget_hours) * 100));
+      const fillEl = document.getElementById(`budget-fill-${p.id}`);
+      const textEl = document.getElementById(`budget-text-${p.id}`);
+      if (fillEl && textEl) {
+        fillEl.style.width = `${pct}%`;
+        fillEl.className = `progress-fill ${pct > 90 ? 'danger' : pct > 75 ? 'warn' : 'safe'}`;
+        textEl.innerText = `${p.hours.toFixed(1)} / ${p.budget_hours} hrs (${pct}%)`;
+      }
+    }
+
+    // Floating Active Timer Dock
+    function updateGlobalTimerDock() {
+      const runningProj = projectsData.find(p => p.running);
+      const dock = document.getElementById('global-timer-dock');
+
+      if (!runningProj) {
+        dock.classList.remove('active');
         return;
       }
 
-      container.innerHTML = projectsData.map(p => `
-        <div class="project-card ${p.running ? 'running' : ''}">
-          <div>
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
-              <div>
-                <h3 style="font-size: 1.2rem; font-weight: 700;">${escapeHtml(p.name)}</h3>
-                <div style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.2rem;">
-                  Client: <strong>${escapeHtml(p.client_name)}</strong> • ${formatMoney(p.hourly_rate, p.currency)}/hr
-                </div>
-              </div>
-              <span class="status-pill ${p.running ? 'active' : 'idle'}">
-                ${p.running ? 'Tracking' : 'Idle'}
-              </span>
-            </div>
-
-            <div class="project-metrics">
-              <div class="metric-item">
-                <div class="label">Time Metered</div>
-                <div class="val" id="proj-time-${p.id}">${(p.hours || 0).toFixed(3)} hrs</div>
-              </div>
-              <div class="metric-item">
-                <div class="label">Billable Total</div>
-                <div class="val" id="proj-cost-${p.id}" style="color: var(--accent-emerald);">
-                  ${formatMoney(p.cost, p.currency)}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="project-footer">
-            ${p.running 
-              ? `<button class="btn btn-danger" onclick="stopClock(${p.id})">Stop Clock</button>`
-              : `<button class="btn btn-success" onclick="startClock(${p.id})">Start Clock</button>`
-            }
-            <button class="btn btn-secondary" onclick="openInvoiceModal(${p.id})">Invoice</button>
-            <button class="btn btn-secondary" onclick="openMsgModal(${p.id})">Notes</button>
-            <button class="btn btn-secondary" title="Copy Live Client Stream Token" onclick="copyShareToken('${p.share_token}')">Share</button>
-            <button class="btn btn-secondary" style="color: var(--accent-rose);" onclick="deleteProject(${p.id})">&times;</button>
-          </div>
-        </div>
-      `).join('');
+      dock.classList.add('active');
+      document.getElementById('dock-proj-name').innerText = runningProj.name;
+      document.getElementById('dock-proj-client').innerText = `Client: ${runningProj.client_name}`;
+      document.getElementById('dock-time-val').innerText = formatHMS(runningProj.hours * 3600);
+      document.getElementById('dock-cost-val').innerText = `${formatMoney(runningProj.cost, runningProj.currency)}`;
     }
 
+    function stopActiveGlobalTimer() {
+      const runningProj = projectsData.find(p => p.running);
+      if (runningProj) {
+        const note = document.getElementById('dock-note-input').value.trim();
+        stopClock(runningProj.id, note);
+        document.getElementById('dock-note-input').value = '';
+      }
+    }
+
+    function toggleRunningActiveClock() {
+      const runningProj = projectsData.find(p => p.running);
+      if (runningProj) {
+        stopClock(runningProj.id);
+      } else if (projectsData.length > 0) {
+        startClock(projectsData[0].id);
+      }
+    }
+
+    // Projects Grid Renderer
+    function renderProjects(filterText = '') {
+      const container = document.getElementById('projects-grid');
+      let list = projectsData;
+
+      if (filterText) {
+        const query = filterText.toLowerCase();
+        list = list.filter(p => p.name.toLowerCase().includes(query) || p.client_name.toLowerCase().includes(query));
+      }
+
+      if (!list.length) {
+        container.innerHTML = `
+          <div class="empty-state" style="grid-column: 1/-1;">
+            <h3>No projects found</h3>
+            <p>Click "New Project" to add your first contract or reset sample data.</p>
+            <button class="btn btn-sm" style="margin-top: 1rem;" onclick="seedSampleData(); fetchProjects();">Reload Sample Projects</button>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = list.map(p => {
+        const budgetPct = p.budget_hours ? Math.min(100, Math.round(((p.hours || 0) / p.budget_hours) * 100)) : 0;
+        const budgetColor = budgetPct > 90 ? 'danger' : budgetPct > 75 ? 'warn' : 'safe';
+
+        return `
+          <div class="project-card ${p.running ? 'running' : ''}" id="card-proj-${p.id}">
+            <div>
+              <div class="project-top">
+                <div>
+                  <h3 class="project-title">${escapeHtml(p.name)}</h3>
+                  <div class="project-client">
+                    Client: <strong>${escapeHtml(p.client_name)}</strong> • ${formatMoney(p.hourly_rate, p.currency)}/hr
+                  </div>
+                </div>
+                <span class="status-pill ${p.running ? 'active' : 'idle'}">
+                  ${p.running ? 'Tracking' : 'Idle'}
+                </span>
+              </div>
+
+              <!-- Budget Progress -->
+              ${p.budget_hours ? `
+                <div class="budget-progress">
+                  <div class="budget-labels">
+                    <span>Budget Utilized</span>
+                    <span id="budget-text-${p.id}">${(p.hours || 0).toFixed(1)} / ${p.budget_hours} hrs (${budgetPct}%)</span>
+                  </div>
+                  <div class="progress-track">
+                    <div id="budget-fill-${p.id}" class="progress-fill ${budgetColor}" style="width: ${budgetPct}%;"></div>
+                  </div>
+                </div>
+              ` : ''}
+
+              <!-- Milestones Chips -->
+              ${p.milestones && p.milestones.length ? `
+                <div class="milestone-preview">
+                  ${p.milestones.map((m, idx) => `
+                    <span class="milestone-chip ${m.completed ? 'completed' : ''}" onclick="toggleProjectMilestone(${p.id}, ${idx})" style="cursor: pointer;" title="Click to toggle completion">
+                      ${m.completed ? '✓' : '○'} ${escapeHtml(m.name)}
+                    </span>
+                  `).join('')}
+                </div>
+              ` : ''}
+
+              <div class="project-metrics">
+                <div class="metric-item">
+                  <div class="label">Time Metered</div>
+                  <div class="val" id="proj-time-${p.id}">${(p.hours || 0).toFixed(3)} hrs</div>
+                </div>
+                <div class="metric-item">
+                  <div class="label">Total Billable</div>
+                  <div class="val" id="proj-cost-${p.id}" style="color: var(--accent-emerald);">
+                    ${formatMoney(p.cost, p.currency)}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="project-footer">
+              ${p.running 
+                ? `<button class="btn btn-danger btn-sm" onclick="stopClock(${p.id})">Stop Clock</button>`
+                : `<button class="btn btn-success btn-sm" onclick="startClock(${p.id})">Start Clock</button>`
+              }
+              <button class="btn btn-secondary btn-sm" onclick="openInvoiceModal(${p.id})">Invoice</button>
+              <button class="btn btn-secondary btn-sm" onclick="openMsgModal(${p.id})">Notes</button>
+              <button class="btn btn-secondary btn-sm" title="Copy Client Share Link" onclick="copyShareToken('${p.share_token}')">Share</button>
+              <button class="btn btn-secondary btn-sm" title="Edit Project" onclick="openEditModal(${p.id})">✎</button>
+              <button class="btn btn-secondary btn-sm" style="color: var(--accent-rose); flex: 0.3;" title="Delete Project" onclick="deleteProject(${p.id})">&times;</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function filterProjects() {
+      const text = document.getElementById('project-search').value.trim();
+      renderProjects(text);
+    }
+
+    // Start / Stop Clock
     async function startClock(id) {
+      AudioEngine.playChime('start');
       const projs = LocalDB.getProjects();
-      projs.forEach(p => { if (p.id === id) { p.running = true; p.running_started_at = Date.now(); } });
+      projs.forEach(p => {
+        if (p.id === id) {
+          p.running = true;
+          p.running_started_at = Date.now();
+        } else {
+          // Pause others to prevent accidental double billing
+          if (p.running) {
+            p.running = false;
+            const entries = LocalDB.getEntries(p.id);
+            entries.push({
+              id: Date.now(),
+              started_at: p.running_started_at || (Date.now() - 3600000),
+              stopped_at: Date.now(),
+              notes: 'Active session',
+              billable: true
+            });
+            LocalDB.saveEntries(p.id, entries);
+          }
+        }
+      });
       LocalDB.saveProjects(projs);
       fetchProjects();
-      showToast('Timer started');
+      showToast('Live Meter started!');
     }
 
-    async function stopClock(id) {
+    async function stopClock(id, customNote = '') {
+      AudioEngine.playChime('stop');
       const projs = LocalDB.getProjects();
       projs.forEach(p => {
         if (p.id === id && p.running) {
           p.running = false;
           const entries = LocalDB.getEntries(id);
-          entries.push({ id: Date.now(), started_at: p.running_started_at || (Date.now() - 3600000), stopped_at: Date.now(), notes: 'Focus Session' });
+          entries.push({
+            id: Date.now(),
+            started_at: p.running_started_at || (Date.now() - 3600000),
+            stopped_at: Date.now(),
+            notes: customNote || 'Focus work session',
+            billable: true
+          });
           LocalDB.saveEntries(id, entries);
         }
       });
       LocalDB.saveProjects(projs);
       fetchProjects();
-      showToast('Timer stopped');
+      showToast('Timer stopped and session recorded!');
+    }
+
+    function toggleProjectMilestone(projId, mIdx) {
+      AudioEngine.playChime('ding');
+      const projs = LocalDB.getProjects();
+      const proj = projs.find(p => p.id === projId);
+      if (proj && proj.milestones && proj.milestones[mIdx]) {
+        proj.milestones[mIdx].completed = !proj.milestones[mIdx].completed;
+        LocalDB.saveProjects(projs);
+        LocalDB.addMessage(projId, 'freelancer', `Milestone "${proj.milestones[mIdx].name}" marked as ${proj.milestones[mIdx].completed ? 'COMPLETED' : 'IN PROGRESS'}.`);
+        fetchProjects();
+        showToast(`Milestone updated!`);
+      }
     }
 
     async function deleteProject(id) {
-      if (!confirm('Delete this project?')) return;
+      if (!confirm('Are you sure you want to delete this project and all associated logs?')) return;
       const projs = LocalDB.getProjects().filter(p => p.id !== id);
       LocalDB.saveProjects(projs);
       fetchProjects();
       showToast('Project deleted');
     }
 
-    function openCreateModal() { document.getElementById('create-modal').classList.add('active'); }
+    // Modal Control
+    function openCreateModal() {
+      document.getElementById('create-modal-title').innerText = 'Create New Project';
+      document.getElementById('edit-proj-id').value = '';
+      document.getElementById('proj-name').value = '';
+      document.getElementById('client-name').value = '';
+      document.getElementById('hourly-rate').value = '';
+      document.getElementById('proj-budget-hours').value = '';
+      document.getElementById('proj-milestones').value = '';
+      document.getElementById('create-modal').classList.add('active');
+    }
+
+    function openEditModal(id) {
+      const proj = projectsData.find(p => p.id === id);
+      if (!proj) return;
+      document.getElementById('create-modal-title').innerText = 'Edit Project';
+      document.getElementById('edit-proj-id').value = proj.id;
+      document.getElementById('proj-name').value = proj.name;
+      document.getElementById('client-name').value = proj.client_name;
+      document.getElementById('hourly-rate').value = proj.hourly_rate;
+      document.getElementById('proj-currency').value = proj.currency || 'USD';
+      document.getElementById('proj-budget-hours').value = proj.budget_hours || '';
+      document.getElementById('proj-milestones').value = proj.milestones ? proj.milestones.map(m => m.name).join(', ') : '';
+      document.getElementById('create-modal').classList.add('active');
+    }
+
     function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
     function handleCreateProject(e) {
       e.preventDefault();
-      const name = document.getElementById('proj-name').value;
-      const client_name = document.getElementById('client-name').value;
+      const editId = document.getElementById('edit-proj-id').value;
+      const name = document.getElementById('proj-name').value.trim();
+      const client_name = document.getElementById('client-name').value.trim();
       const hourly_rate = parseFloat(document.getElementById('hourly-rate').value);
       const currency = document.getElementById('proj-currency').value;
+      const budget_hours = parseFloat(document.getElementById('proj-budget-hours').value) || null;
+      const rawMilestones = document.getElementById('proj-milestones').value.split(',').map(s => s.trim()).filter(Boolean);
+      const milestones = rawMilestones.map(m => ({ name: m, completed: false }));
 
       const projs = LocalDB.getProjects();
-      projs.push({ id: Date.now(), name, client_name, hourly_rate, currency, share_token: Math.random().toString(36).substring(2), running: false });
+
+      if (editId) {
+        const existing = projs.find(p => p.id === parseInt(editId));
+        if (existing) {
+          existing.name = name;
+          existing.client_name = client_name;
+          existing.hourly_rate = hourly_rate;
+          existing.currency = currency;
+          existing.budget_hours = budget_hours;
+          if (milestones.length) existing.milestones = milestones;
+        }
+      } else {
+        projs.unshift({
+          id: Date.now(),
+          name,
+          client_name,
+          hourly_rate,
+          currency,
+          budget_hours,
+          milestones,
+          share_token: 'meter-' + Math.random().toString(36).substring(2, 9),
+          running: false
+        });
+      }
+
       LocalDB.saveProjects(projs);
       closeModal('create-modal');
       fetchProjects();
-      showToast('Project created!');
+      showToast(editId ? 'Project updated!' : 'Project created successfully!');
     }
 
-    function renderAnalyticsCharts() {
+    // Manual Time Entry
+    function openManualEntryModal() {
+      const select = document.getElementById('manual-proj-select');
+      select.innerHTML = projectsData.map(p => `<option value="${p.id}">${escapeHtml(p.name)} (${escapeHtml(p.client_name)})</option>`).join('');
+      document.getElementById('manual-hours').value = '1.0';
+      document.getElementById('manual-notes').value = '';
+      document.getElementById('manual-billable').checked = true;
+      document.getElementById('manual-modal').classList.add('active');
+    }
+
+    function handleManualEntry(e) {
+      e.preventDefault();
+      const projId = parseInt(document.getElementById('manual-proj-select').value);
+      const hours = parseFloat(document.getElementById('manual-hours').value);
+      const dateVal = document.getElementById('manual-date').value;
+      const notes = document.getElementById('manual-notes').value.trim() || 'Manual time logged';
+      const billable = document.getElementById('manual-billable').checked;
+
+      const started_at = new Date(dateVal).getTime() + (9 * 3600000); // 9am standard
+      const stopped_at = started_at + (hours * 3600000);
+
+      const entries = LocalDB.getEntries(projId);
+      entries.push({ id: Date.now(), started_at, stopped_at, notes, billable });
+      LocalDB.saveEntries(projId, entries);
+
+      closeModal('manual-modal');
+      fetchProjects();
+      showToast(`Added ${hours}h manual time successfully!`);
+    }
+
+    // Analytics Charts
+    function renderAnalyticsCharts(range = 'week') {
       const ctxWeekly = document.getElementById('chart-weekly').getContext('2d');
       const ctxRevenue = document.getElementById('chart-revenue').getContext('2d');
 
       if (weeklyChartInstance) weeklyChartInstance.destroy();
       if (revenueChartInstance) revenueChartInstance.destroy();
 
+      const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+      const textColor = isLight ? '#0f172a' : '#f3f4f6';
+      const gridColor = isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.06)';
+
       weeklyChartInstance = new Chart(ctxWeekly, {
         type: 'bar',
         data: {
           labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-          datasets: [{ label: 'Hours Tracked', data: [4.5, 6.2, 5.8, 7.1, 4.0, 2.5, 1.0], backgroundColor: '#6366f1' }]
+          datasets: [{
+            label: 'Hours Metered',
+            data: [5.2, 7.0, 6.5, 8.1, 5.8, 3.0, 1.5],
+            backgroundColor: '#6366f1',
+            borderRadius: 8
+          }]
         },
-        options: { responsive: true, plugins: { legend: { display: false } } }
+        options: {
+          responsive: true,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { ticks: { color: textColor }, grid: { display: false } },
+            y: { ticks: { color: textColor }, grid: { color: gridColor } }
+          }
+        }
       });
 
       revenueChartInstance = new Chart(ctxRevenue, {
         type: 'doughnut',
         data: {
-          labels: projectsData.map(p => p.name),
-          datasets: [{ data: projectsData.map(p => p.cost || 100), backgroundColor: ['#6366f1', '#10b981', '#f59e0b', '#06b6d4'] }]
+          labels: projectsData.map(p => p.client_name),
+          datasets: [{
+            data: projectsData.map(p => Math.max(10, p.cost || 50)),
+            backgroundColor: ['#6366f1', '#10b981', '#06b6d4', '#f59e0b', '#a855f7'],
+            borderWidth: 0
+          }]
         },
-        options: { responsive: true }
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { position: 'bottom', labels: { color: textColor } }
+          }
+        }
       });
     }
 
     // Pomodoro Controls
+    function populatePomodoroProjects() {
+      const select = document.getElementById('pomo-project-select');
+      select.innerHTML = projectsData.map(p => `<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('');
+    }
+
     function startPomodoro() {
+      AudioEngine.playChime('start');
       if (pomodoroInterval) return;
+      document.getElementById('pomo-start-btn').innerText = 'Running...';
       pomodoroInterval = setInterval(() => {
         if (pomodoroSeconds > 0) {
           pomodoroSeconds--;
           updatePomoDisplay();
         } else {
           pausePomodoro();
-          showToast('Focus session completed!');
+          AudioEngine.playChime('ding');
+          showToast('Focus session complete! 25 minutes logged.');
+
+          // Log to selected project
+          const projId = parseInt(document.getElementById('pomo-project-select').value);
+          if (projId && !isPomoBreak) {
+            const entries = LocalDB.getEntries(projId);
+            entries.push({
+              id: Date.now(),
+              started_at: Date.now() - (25 * 60000),
+              stopped_at: Date.now(),
+              notes: 'Pomodoro Deep Focus Block',
+              billable: true
+            });
+            LocalDB.saveEntries(projId, entries);
+            fetchProjects();
+          }
         }
       }, 1000);
     }
-    function pausePomodoro() { clearInterval(pomodoroInterval); pomodoroInterval = null; }
-    function resetPomodoro() { pausePomodoro(); pomodoroSeconds = 25 * 60; updatePomoDisplay(); }
+
+    function pausePomodoro() {
+      clearInterval(pomodoroInterval);
+      pomodoroInterval = null;
+      document.getElementById('pomo-start-btn').innerText = 'Resume';
+    }
+
+    function resetPomodoro() {
+      pausePomodoro();
+      pomodoroSeconds = isPomoBreak ? 5 * 60 : 25 * 60;
+      document.getElementById('pomo-start-btn').innerText = 'Start Focus';
+      updatePomoDisplay();
+    }
+
+    function switchPomodoroMode() {
+      isPomoBreak = !isPomoBreak;
+      document.getElementById('pomo-mode-label').innerText = isPomoBreak ? 'Rest Break' : 'Focus Interval';
+      pomodoroSeconds = isPomoBreak ? 5 * 60 : 25 * 60;
+      updatePomoDisplay();
+      resetPomodoro();
+    }
+
     function updatePomoDisplay() {
       const mins = Math.floor(pomodoroSeconds / 60);
       const secs = pomodoroSeconds % 60;
       document.getElementById('pomo-display').innerText = `${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
     }
 
-    // Invoice Modal
+    // Invoices View & Modal
+    function renderInvoicesTable() {
+      const tbody = document.getElementById('invoices-project-table');
+      if (!projectsData.length) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No projects created yet</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = projectsData.map(p => {
+        const budgetPct = p.budget_hours ? Math.round(((p.hours || 0) / p.budget_hours) * 100) : 'N/A';
+        return `
+          <tr>
+            <td><strong>${escapeHtml(p.name)}</strong></td>
+            <td>${escapeHtml(p.client_name)}</td>
+            <td>${formatMoney(p.hourly_rate, p.currency)}/hr</td>
+            <td>${(p.hours || 0).toFixed(2)} hrs</td>
+            <td style="color: var(--accent-emerald); font-weight: 700;">${formatMoney(p.cost, p.currency)}</td>
+            <td>${budgetPct !== 'N/A' ? `${budgetPct}%` : 'Flexible'}</td>
+            <td>
+              <button class="btn btn-sm" onclick="openInvoiceModal(${p.id})">Generate Invoice</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
     function openInvoiceModal(id) {
       const proj = projectsData.find(p => p.id === id);
       if (!proj) return;
-      document.getElementById('invoice-title').innerText = `Invoice — ${proj.name}`;
+      const profile = LocalDB.getProfile();
+      const entries = LocalDB.getEntries(id);
+
+      document.getElementById('invoice-title').innerText = `Invoice Statement — ${proj.name}`;
       document.getElementById('invoice-modal').classList.add('active');
 
-      const entries = LocalDB.getEntries(id);
-      const body = document.getElementById('invoice-body');
-      body.innerHTML = `
-        <div style="margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem;">
-          <div><strong>Client:</strong> ${escapeHtml(proj.client_name)}</div>
-          <div><strong>Hourly Rate:</strong> ${formatMoney(proj.hourly_rate, proj.currency)}/hr</div>
-          <div style="font-size: 1.25rem; font-weight: 800; color: var(--accent-emerald); margin-top: 0.5rem;">
-            Total Billable Amount: ${formatMoney(proj.cost, proj.currency)}
+      const invNumber = `INV-${new Date().getFullYear()}-${String(proj.id).padStart(4, '0')}`;
+      const invDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+      document.getElementById('invoice-body').innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid var(--border-color); padding-bottom: 1.5rem; margin-bottom: 1.5rem;">
+          <div>
+            <h2 style="font-size: 1.8rem; font-weight: 800; letter-spacing: -0.02em;">${escapeHtml(profile.name)}</h2>
+            <div style="color: var(--text-muted); font-size: 0.88rem; margin-top: 0.35rem;">${escapeHtml(profile.address)}</div>
+            <div style="color: var(--text-muted); font-size: 0.88rem;">${escapeHtml(profile.email)}</div>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 800; color: var(--primary-glow);">${invNumber}</div>
+            <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem;">Date: ${invDate}</div>
+            <div style="font-size: 0.85rem; color: var(--text-muted);">Payment Terms: <strong>Due Upon Receipt</strong></div>
           </div>
         </div>
 
-        <h4 style="margin-bottom: 0.5rem;">Time Log Sessions</h4>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 1.5rem; background: rgba(0,0,0,0.18); padding: 1rem 1.25rem; border-radius: 12px; border: 1px solid var(--border-color);">
+          <div>
+            <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Billed To:</div>
+            <div style="font-size: 1.1rem; font-weight: 800; margin-top: 0.25rem;">${escapeHtml(proj.client_name)}</div>
+            <div style="font-size: 0.88rem; color: var(--text-muted); margin-top: 0.2rem;">Project: ${escapeHtml(proj.name)}</div>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Total Amount Due:</div>
+            <div style="font-family: var(--font-mono); font-size: 1.8rem; font-weight: 800; color: var(--accent-emerald); margin-top: 0.25rem;">
+              ${formatMoney(proj.cost, proj.currency)}
+            </div>
+          </div>
+        </div>
+
+        <h4 style="margin-bottom: 0.6rem; font-size: 1rem;">Itemized Session Log</h4>
         <div class="table-container">
           <table>
             <thead>
-              <tr><th>Session Date</th><th>Duration</th><th>Subtotal</th><th>Notes</th></tr>
+              <tr>
+                <th>Date &amp; Time</th>
+                <th>Task Description</th>
+                <th>Type</th>
+                <th>Duration</th>
+                <th>Rate</th>
+                <th>Line Total</th>
+              </tr>
             </thead>
             <tbody>
               ${entries.length ? entries.map(e => {
                 const durMs = (e.stopped_at || Date.now()) - e.started_at;
                 const hrs = durMs / 3600000;
-                return `<tr><td>${new Date(e.started_at).toLocaleDateString()}</td><td>${hrs.toFixed(2)} hrs</td><td>${formatMoney(hrs * proj.hourly_rate, proj.currency)}</td><td>${escapeHtml(e.notes || 'Session')}</td></tr>`;
-              }).join('') : '<tr><td colspan="4">No sessions recorded yet</td></tr>'}
+                const isBill = e.billable !== false;
+                const sub = isBill ? (hrs * proj.hourly_rate) : 0;
+                return `
+                  <tr>
+                    <td>${new Date(e.started_at).toLocaleDateString()}</td>
+                    <td>${escapeHtml(e.notes || 'Development & Architecture')}</td>
+                    <td><span class="tag-pill ${isBill ? 'tag-billable' : 'tag-nonbillable'}">${isBill ? 'Billable' : 'Internal'}</span></td>
+                    <td>${hrs.toFixed(2)} hrs</td>
+                    <td>${formatMoney(proj.hourly_rate, proj.currency)}</td>
+                    <td style="font-weight: 700;">${formatMoney(sub, proj.currency)}</td>
+                  </tr>
+                `;
+              }).join('') : '<tr><td colspan="6" style="text-align: center;">No individual sessions recorded.</td></tr>'}
             </tbody>
           </table>
+        </div>
+
+        <div style="margin-top: 1.75rem; padding-top: 1.25rem; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <div style="font-size: 0.78rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Payment Instructions:</div>
+            <div style="font-size: 0.88rem; font-family: var(--font-mono); margin-top: 0.35rem;">${escapeHtml(profile.payment)}</div>
+          </div>
+          <div style="text-align: right;">
+            <div style="color: var(--text-muted); font-size: 0.85rem;">Total Hours: ${(proj.hours || 0).toFixed(2)} hrs</div>
+            <div style="font-size: 1.4rem; font-weight: 800; color: var(--accent-emerald); font-family: var(--font-mono);">
+              Final Total: ${formatMoney(proj.cost, proj.currency)}
+            </div>
+          </div>
         </div>
       `;
     }
 
-    function openMsgModal(id) {
-      activeMsgProjectId = id;
-      document.getElementById('msg-modal').classList.add('active');
-      renderChat(LocalDB.getMessages(id));
+    function openInvoiceSettingsModal() {
+      const p = LocalDB.getProfile();
+      document.getElementById('biz-name').value = p.name || '';
+      document.getElementById('biz-email').value = p.email || '';
+      document.getElementById('biz-address').value = p.address || '';
+      document.getElementById('biz-payment').value = p.payment || '';
+      document.getElementById('business-modal').classList.add('active');
     }
 
-    function renderChat(msgs) {
-      const chatBox = document.getElementById('modal-chat-box');
-      if (!msgs || !msgs.length) {
-        chatBox.innerHTML = '<div style="color: var(--text-muted); text-align: center; margin: auto;">No notes yet.</div>';
-        return;
-      }
-      chatBox.innerHTML = msgs.map(m => `
-        <div class="chat-msg ${m.sender === 'freelancer' ? 'freelancer' : 'client'}">
-          <div><strong>${m.sender === 'freelancer' ? 'You' : 'Client'}:</strong> ${escapeHtml(m.content)}</div>
-        </div>
-      `).join('');
-    }
-
-    function handleSendMessage(e) {
+    function saveBusinessProfile(e) {
       e.preventDefault();
-      if (!activeMsgProjectId) return;
-      const input = document.getElementById('msg-input');
-      LocalDB.addMessage(activeMsgProjectId, 'freelancer', input.value);
-      input.value = '';
-      renderChat(LocalDB.getMessages(activeMsgProjectId));
-      showToast('Note posted');
-    }
-
-    function copyShareToken(token) {
-      const shareUrl = `${window.location.origin}${window.location.pathname}?token=${token}`;
-      navigator.clipboard.writeText(shareUrl);
-      document.getElementById('live-token-input').value = token;
-      showToast('Live Client Share Link copied!');
-    }
-
-    function exportDataCSV() {
-      let csv = 'Project,Client,Hourly Rate,Currency,Total Hours,Total Cost\n';
-      projectsData.forEach(p => {
-        csv += `"${p.name}","${p.client_name}",${p.hourly_rate},${p.currency},${(p.hours||0).toFixed(2)},${(p.cost||0).toFixed(2)}\n`;
+      LocalDB.saveProfile({
+        name: document.getElementById('biz-name').value.trim(),
+        email: document.getElementById('biz-email').value.trim(),
+        address: document.getElementById('biz-address').value.trim(),
+        payment: document.getElementById('biz-payment').value.trim()
       });
-      const blob = new Blob([csv], { type: 'text/csv' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = `metter-projects-${Date.now()}.csv`;
-      a.click();
+      closeModal('business-modal');
+      showToast('Business profile updated!');
+    }
+
+    // Client Live View Stream
+    function loadSampleClientStream() {
+      if (projectsData.length > 0) {
+        document.getElementById('live-token-input').value = projectsData[0].share_token;
+        connectLiveStream();
+      }
     }
 
     function connectLiveStream(isTick = false) {
@@ -951,6 +1777,7 @@
       const projs = LocalDB.getProjects();
       const proj = projs.find(p => p.share_token === token) || projs[0];
       if (!proj) return;
+
       const entries = LocalDB.getEntries(proj.id);
       let totalMs = 0;
       entries.forEach(e => totalMs += ((e.stopped_at || Date.now()) - e.started_at));
@@ -968,13 +1795,34 @@
 
       document.getElementById('live-content').innerHTML = `
         <div class="live-hero">
-          <span class="status-pill ${proj.running ? 'active' : 'idle'}" style="margin: 0 auto;">${proj.running ? 'Work in Progress (Live Meter)' : 'Timer Paused'}</span>
-          <h2 style="font-size: 2rem; font-weight: 800; margin-top: 0.75rem;">${escapeHtml(proj.name)}</h2>
-          <div style="color: var(--text-muted);">Client: <strong>${escapeHtml(proj.client_name)}</strong> • Rate: ${formatMoney(proj.hourly_rate, proj.currency)}/hr</div>
+          <span class="status-pill ${proj.running ? 'active' : 'idle'}" style="margin: 0 auto;">
+            ${proj.running ? 'Work in Progress (Live Meter)' : 'Timer Paused'}
+          </span>
+          <h2 style="font-size: 2.2rem; font-weight: 800; margin-top: 0.75rem;">${escapeHtml(proj.name)}</h2>
+          <div style="color: var(--text-muted); font-size: 1rem;">Client: <strong>${escapeHtml(proj.client_name)}</strong> • Rate: ${formatMoney(proj.hourly_rate, proj.currency)}/hr</div>
           <div class="live-hero-timer" id="live-timer-val">${formatHMS(hours * 3600)}</div>
           <div class="live-cost-badge" id="live-cost-val">${formatMoney(hours * proj.hourly_rate, proj.currency)} Total Billable</div>
         </div>
-        <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem;">Live Activity & Client Feed</h3>
+
+        <!-- Client Milestones Approval Section -->
+        ${proj.milestones && proj.milestones.length ? `
+          <div style="margin-bottom: 2rem; background: rgba(0,0,0,0.2); padding: 1.25rem; border-radius: 16px; border: 1px solid var(--border-color);">
+            <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.75rem;">Deliverables &amp; Client Milestones</h3>
+            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+              ${proj.milestones.map((m, idx) => `
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0.75rem; border-radius: 8px; background: rgba(255,255,255,0.04);">
+                  <span><strong>${idx + 1}.</strong> ${escapeHtml(m.name)}</span>
+                  ${m.completed 
+                    ? `<span style="color: var(--accent-emerald); font-weight: 700; font-size: 0.85rem;">✓ Approved</span>`
+                    : `<button class="btn btn-sm btn-secondary" onclick="clientApproveMilestone('${proj.share_token}', ${idx})">Approve Milestone</button>`
+                  }
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        ` : ''}
+
+        <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem;">Live Activity &amp; Communication Stream</h3>
         <div class="chat-box">
           ${msgs && msgs.length ? msgs.map(m => `
             <div class="chat-msg ${m.sender === 'freelancer' ? 'freelancer' : 'client'}">
@@ -983,11 +1831,26 @@
             </div>
           `).join('') : '<div style="color: var(--text-muted); text-align: center; margin: auto;">No updates yet.</div>'}
         </div>
+
         <form onsubmit="handleClientReply(event, ${proj.id})" style="display: flex; gap: 0.5rem;">
-          <input type="text" id="client-reply-input" class="form-control" placeholder="Send a message or milestone approval..." required>
+          <input type="text" id="client-reply-input" class="form-control" placeholder="Send milestone feedback or notes..." required>
           <button type="submit" class="btn">Send Reply</button>
         </form>
       `;
+    }
+
+    function clientApproveMilestone(token, mIdx) {
+      AudioEngine.playChime('ding');
+      const projs = LocalDB.getProjects();
+      const proj = projs.find(p => p.share_token === token);
+      if (proj && proj.milestones && proj.milestones[mIdx]) {
+        proj.milestones[mIdx].completed = true;
+        LocalDB.saveProjects(projs);
+        LocalDB.addMessage(proj.id, 'client', `Client has APPROVED milestone "${proj.milestones[mIdx].name}".`);
+        connectLiveStream(false);
+        fetchProjects();
+        showToast('Milestone approved & recorded!');
+      }
     }
 
     function handleClientReply(e, projId) {
@@ -997,7 +1860,120 @@
       LocalDB.addMessage(projId, 'client', input.value.trim());
       input.value = '';
       connectLiveStream(false);
-      showToast('Client message sent!');
+      showToast('Client reply sent!');
+    }
+
+    // Message Drawer for Freelancer
+    function openMsgModal(id) {
+      activeMsgProjectId = id;
+      document.getElementById('msg-modal').classList.add('active');
+      renderChat(LocalDB.getMessages(id));
+    }
+
+    function renderChat(msgs) {
+      const chatBox = document.getElementById('modal-chat-box');
+      if (!msgs || !msgs.length) {
+        chatBox.innerHTML = '<div style="color: var(--text-muted); text-align: center; margin: auto;">No updates in stream yet.</div>';
+        return;
+      }
+      chatBox.innerHTML = msgs.map(m => `
+        <div class="chat-msg ${m.sender === 'freelancer' ? 'freelancer' : 'client'}">
+          <div><strong>${m.sender === 'freelancer' ? 'You' : 'Client'}:</strong> ${escapeHtml(m.content)}</div>
+        </div>
+      `).join('');
+    }
+
+    function handleSendMessage(e) {
+      e.preventDefault();
+      if (!activeMsgProjectId) return;
+      const input = document.getElementById('msg-input');
+      LocalDB.addMessage(activeMsgProjectId, 'freelancer', input.value.trim());
+      input.value = '';
+      renderChat(LocalDB.getMessages(activeMsgProjectId));
+      showToast('Note posted to live stream!');
+    }
+
+    function copyShareToken(token) {
+      const shareUrl = `${window.location.origin}${window.location.pathname}?token=${token}`;
+      navigator.clipboard.writeText(shareUrl);
+      document.getElementById('live-token-input').value = token;
+      showToast('Live Client Share Link copied to clipboard!');
+    }
+
+    // CSV and Data Portability
+    function exportDataCSV() {
+      let csv = 'Project,Client,Hourly Rate,Currency,Total Hours,Billable Hours,Total Cost,Budget Hours\n';
+      projectsData.forEach(p => {
+        csv += `"${p.name}","${p.client_name}",${p.hourly_rate},${p.currency},${(p.hours||0).toFixed(2)},${(p.billableHours||0).toFixed(2)},${(p.cost||0).toFixed(2)},${p.budget_hours||'N/A'}\n`;
+      });
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = `taskmeter-report-${Date.now()}.csv`;
+      a.click();
+      showToast('CSV export downloaded!');
+    }
+
+    function openBackupModal() { document.getElementById('backup-modal').classList.add('active'); }
+
+    function downloadJSONBackup() {
+      const data = {
+        projects: LocalDB.getProjects(),
+        entries: JSON.parse(localStorage.getItem('metter_entries') || '{}'),
+        messages: JSON.parse(localStorage.getItem('metter_messages') || '{}'),
+        profile: LocalDB.getProfile(),
+        exported_at: new Date().toISOString()
+      };
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = `taskmeter-backup-${Date.now()}.json`;
+      a.click();
+      showToast('Backup file saved!');
+    }
+
+    function restoreJSONBackup(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        try {
+          const parsed = JSON.parse(event.target.result);
+          if (parsed.projects) LocalDB.saveProjects(parsed.projects);
+          if (parsed.entries) localStorage.setItem('metter_entries', JSON.stringify(parsed.entries));
+          if (parsed.messages) localStorage.setItem('metter_messages', JSON.stringify(parsed.messages));
+          if (parsed.profile) LocalDB.saveProfile(parsed.profile);
+          closeModal('backup-modal');
+          fetchProjects();
+          showToast('Workspace data restored successfully!');
+        } catch (err) {
+          showToast('Invalid backup file');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function clearAllData() {
+      if (!confirm('This will wipe all projects and session logs from your browser. Are you sure?')) return;
+      localStorage.removeItem('metter_projects');
+      localStorage.removeItem('metter_entries');
+      localStorage.removeItem('metter_messages');
+      closeModal('backup-modal');
+      fetchProjects();
+      showToast('Workspace reset to empty.');
+    }
+
+    function openDemoSwitcher() {
+      if (confirm('Reload agency sample projects and milestone data?')) {
+        seedSampleData();
+        fetchProjects();
+        showToast('Sample projects loaded!');
+      }
+    }
+
+    function openShortcutsModal(e) {
+      if (e) e.preventDefault();
+      document.getElementById('shortcuts-modal').classList.add('active');
     }
 
     function showToast(msg) {
@@ -1008,7 +1984,7 @@
 
     function escapeHtml(str) {
       if (!str) return '';
-      return str.replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[m]);
+      return String(str).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[m]);
     }
   </script>
 </body>

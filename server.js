@@ -1,5 +1,5 @@
 // ===============================
-// FREELANCE TIME CLOCK & BILLING API
+// TASKMETER STUDIO — BACKEND API
 // Production-ready feature-rich backend
 // ===============================
 
@@ -18,7 +18,7 @@ app.use(express.static(path.join(__dirname, "public")));
 const db = new sqlite3.Database("data.db");
 
 // ===============================
-// DATABASE SETUP
+// DATABASE SETUP & MIGRATIONS
 // ===============================
 db.serialize(() => {
   db.run(`
@@ -38,6 +38,8 @@ db.serialize(() => {
       client_name TEXT,
       hourly_rate REAL DEFAULT 0,
       currency TEXT DEFAULT 'USD',
+      budget_hours REAL DEFAULT 0,
+      milestones TEXT DEFAULT '[]',
       share_token TEXT,
       status TEXT DEFAULT 'In Progress',
       FOREIGN KEY(user_id) REFERENCES users(id)
@@ -51,6 +53,7 @@ db.serialize(() => {
       started_at INTEGER,
       stopped_at INTEGER,
       notes TEXT,
+      billable INTEGER DEFAULT 1,
       FOREIGN KEY(project_id) REFERENCES projects(id)
     )
   `);
@@ -122,15 +125,16 @@ app.post("/login", (req, res) => {
 // PROJECT ROUTES
 // ===============================
 app.post("/projects", auth, (req, res) => {
-  const { name, client_name, hourly_rate, currency } = req.body;
+  const { name, client_name, hourly_rate, currency, budget_hours, milestones } = req.body;
   if (!name || !client_name) return res.status(400).json({ error: "Name and Client Name are required" });
 
-  const share_token = Math.random().toString(36).substring(2) + Math.random().toString(36).substring(2);
+  const share_token = 'meter-' + Math.random().toString(36).substring(2, 9);
+  const milestonesJson = typeof milestones === 'string' ? milestones : JSON.stringify(milestones || []);
 
   db.run(
-    `INSERT INTO projects (user_id, name, client_name, hourly_rate, currency, share_token)
-     VALUES (?, ?, ?, ?, ?, ?)`,
-    [req.user.id, name, client_name, hourly_rate || 0, currency || 'USD', share_token],
+    `INSERT INTO projects (user_id, name, client_name, hourly_rate, currency, budget_hours, milestones, share_token)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    [req.user.id, name, client_name, hourly_rate || 0, currency || 'USD', budget_hours || 0, milestonesJson, share_token],
     function (err) {
       if (err) return res.json({ error: "Error creating project" });
       res.json({ projectId: this.lastID, share_token });
@@ -146,24 +150,30 @@ app.get("/projects", auth, (req, res) => {
       rows.map(row => new Promise(resolve => {
         db.all(`SELECT * FROM time_entries WHERE project_id = ?`, [row.id], (err2, entries) => {
           let totalMs = 0;
+          let billableMs = 0;
           let running = false;
 
           (entries || []).forEach(e => {
-            if (e.stopped_at) totalMs += e.stopped_at - e.started_at;
-            else {
-              running = true;
-              totalMs += Date.now() - e.started_at;
-            }
+            const dur = e.stopped_at ? (e.stopped_at - e.started_at) : (Date.now() - e.started_at);
+            totalMs += dur;
+            if (e.billable !== 0) billableMs += dur;
+            if (!e.stopped_at) running = true;
           });
 
           const hours = totalMs / 3600000;
-          const cost = hours * (row.hourly_rate || 0);
+          const billableHours = billableMs / 3600000;
+          const cost = billableHours * (row.hourly_rate || 0);
+
+          let parsedMilestones = [];
+          try { parsedMilestones = JSON.parse(row.milestones || '[]'); } catch (e) {}
 
           resolve({
             ...row,
             running,
             hours,
+            billableHours,
             cost,
+            milestones: parsedMilestones,
             entriesCount: (entries || []).length
           });
         });
@@ -205,7 +215,7 @@ app.post("/projects/:id/start", auth, (req, res) => {
         if (rows && rows.length > 0) return res.json({ error: "Another project clock is currently running" });
 
         db.run(
-          `INSERT INTO time_entries (project_id, started_at) VALUES (?, ?)`,
+          `INSERT INTO time_entries (project_id, started_at, billable) VALUES (?, ?, 1)`,
           [projectId, Date.now()],
           () => res.json({ message: "Clock started" })
         );
@@ -216,13 +226,14 @@ app.post("/projects/:id/start", auth, (req, res) => {
 
 app.post("/projects/:id/stop", auth, (req, res) => {
   const projectId = req.params.id;
+  const { notes } = req.body || {};
 
   db.get(`SELECT * FROM time_entries WHERE project_id = ? AND stopped_at IS NULL`, [projectId], (err, entry) => {
     if (!entry) return res.json({ error: "No running clock for this project" });
 
     db.run(
-      `UPDATE time_entries SET stopped_at = ? WHERE id = ?`,
-      [Date.now(), entry.id],
+      `UPDATE time_entries SET stopped_at = ?, notes = COALESCE(?, notes) WHERE id = ?`,
+      [Date.now(), notes, entry.id],
       () => res.json({ message: "Clock stopped" })
     );
   });
@@ -235,10 +246,10 @@ app.get("/projects/:id/entries", auth, (req, res) => {
 });
 
 app.post("/projects/:id/entries", auth, (req, res) => {
-  const { started_at, stopped_at, notes } = req.body;
+  const { started_at, stopped_at, notes, billable } = req.body;
   db.run(
-    `INSERT INTO time_entries (project_id, started_at, stopped_at, notes) VALUES (?, ?, ?, ?)`,
-    [req.params.id, started_at, stopped_at, notes || ''],
+    `INSERT INTO time_entries (project_id, started_at, stopped_at, notes, billable) VALUES (?, ?, ?, ?, ?)`,
+    [req.params.id, started_at, stopped_at, notes || '', billable !== false ? 1 : 0],
     function (err) {
       if (err) return res.json({ error: "Failed to add manual entry" });
       res.json({ entryId: this.lastID });
@@ -281,6 +292,35 @@ app.post("/live/:token/messages", (req, res) => {
   });
 });
 
+app.post("/live/:token/milestones/:idx/approve", (req, res) => {
+  const token = req.params.token;
+  const mIdx = parseInt(req.params.idx);
+
+  db.get(`SELECT * FROM projects WHERE share_token = ?`, [token], (err, project) => {
+    if (!project) return res.status(404).json({ error: "Project not found" });
+
+    let milestones = [];
+    try { milestones = JSON.parse(project.milestones || '[]'); } catch (e) {}
+
+    if (milestones[mIdx]) {
+      milestones[mIdx].completed = true;
+      db.run(
+        `UPDATE projects SET milestones = ? WHERE id = ?`,
+        [JSON.stringify(milestones), project.id],
+        () => {
+          db.run(
+            `INSERT INTO messages (project_id, sender, content, created_at) VALUES (?, 'client', ?, ?)`,
+            [project.id, `Client has APPROVED milestone: "${milestones[mIdx].name}"`, Date.now()]
+          );
+          res.json({ ok: true, milestones });
+        }
+      );
+    } else {
+      res.status(400).json({ error: "Milestone index not found" });
+    }
+  });
+});
+
 app.get("/live/:token", (req, res) => {
   const token = req.params.token;
 
@@ -294,27 +334,32 @@ app.get("/live/:token", (req, res) => {
 
       db.all(`SELECT * FROM time_entries WHERE project_id = ?`, [project.id], (err2, entries) => {
         let totalMs = 0;
+        let billableMs = 0;
         let running = false;
 
         (entries || []).forEach(e => {
-          if (e.stopped_at) totalMs += e.stopped_at - e.started_at;
-          else {
-            running = true;
-            totalMs += Date.now() - e.started_at;
-          }
+          const dur = e.stopped_at ? (e.stopped_at - e.started_at) : (Date.now() - e.started_at);
+          totalMs += dur;
+          if (e.billable !== 0) billableMs += dur;
+          if (!e.stopped_at) running = true;
         });
 
         const hours = totalMs / 3600000;
-        const cost = hours * (project.hourly_rate || 0);
+        const billableHours = billableMs / 3600000;
+        const cost = billableHours * (project.hourly_rate || 0);
+
+        let parsedMilestones = [];
+        try { parsedMilestones = JSON.parse(project.milestones || '[]'); } catch (e) {}
 
         db.all(
           `SELECT * FROM messages WHERE project_id = ? ORDER BY created_at ASC`,
           [project.id],
           (err3, msgs) => {
             res.write(`data: ${JSON.stringify({
-              project,
+              project: { ...project, milestones: parsedMilestones },
               running,
               hours,
+              billableHours,
               cost,
               messages: msgs || []
             })}\n\n`);
@@ -331,4 +376,4 @@ app.get("/live/:token", (req, res) => {
 });
 
 const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => console.log(`Freelance Time Clock API live on port ${PORT}`));
+app.listen(PORT, () => console.log(`TaskMeter Studio API live on port ${PORT}`));
