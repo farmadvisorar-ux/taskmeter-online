@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TaskMeter — Master Administration Control Center</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-dark: #060813;
+      --bg-card: rgba(13, 18, 35, 0.92);
+      --bg-card-hover: rgba(20, 28, 54, 0.95);
+      --border-color: rgba(255, 255, 255, 0.09);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --primary: #6366f1;
+      --primary-glow: #818cf8;
+      --accent-emerald: #10b981;
+      --accent-rose: #f43f5e;
+      --accent-amber: #f59e0b;
+      --accent-cyan: #06b6d4;
+      --accent-purple: #a855f7;
+      --font-main: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.08) 0%, transparent 40%),
+                  radial-gradient(circle at 90% 80%, rgba(16, 185, 129, 0.05) 0%, transparent 40%),
+                  var(--bg-dark);
+      color: var(--text-main);
+      font-family: var(--font-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Secret Admin Header */
+    header {
+      background: rgba(8, 11, 24, 0.95);
+      border-bottom: 1px solid var(--border-color);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      backdrop-filter: blur(12px);
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #f43f5e, #a855f7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 20px rgba(244, 63, 94, 0.4);
+      font-size: 1.25rem;
+    }
+    .brand-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+    .admin-pill {
+      background: rgba(244, 63, 94, 0.16);
+      border: 1px solid rgba(244, 63, 94, 0.35);
+      color: var(--accent-rose);
+      font-size: 0.68rem;
+      font-weight: 800;
+      padding: 0.2rem 0.55rem;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-left: 0.5rem;
+    }
+
+    /* Admin Navigation Tabs */
+    .admin-nav {
+      display: flex;
+      gap: 0.5rem;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 4px;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+    }
+    .admin-nav-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 0.45rem 1rem;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .admin-nav-btn:hover { color: var(--text-main); }
+    .admin-nav-btn.active {
+      background: var(--primary);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
+    }
+
+    /* Container & Layout */
+    main {
+      flex: 1;
+      padding: 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* Auth Gate Screen (When not logged in as Admin) */
+    #admin-auth-gate {
+      max-width: 440px;
+      margin: 4rem auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 2.25rem;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    /* KPI Row */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 2rem;
+    }
+    .kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 1.25rem 1.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .kpi-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.4rem;
+    }
+    .kpi-value {
+      font-size: 1.85rem;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      color: var(--text-main);
+    }
+
+    /* Data Tables */
+    .data-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 18px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .data-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .table-container {
+      overflow-x: auto;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.88rem;
+    }
+    th {
+      background: rgba(255, 255, 255, 0.03);
+      padding: 0.85rem 1rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border-color);
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    td {
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      vertical-align: middle;
+    }
+    tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    /* Badges & Tags */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.2rem 0.55rem;
+      border-radius: 6px;
+      text-transform: uppercase;
+    }
+    .badge-active { background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald); border: 1px solid rgba(16, 185, 129, 0.35); }
+    .badge-suspended { background: rgba(244, 63, 94, 0.15); color: var(--accent-rose); border: 1px solid rgba(244, 63, 94, 0.35); }
+    .badge-admin { background: rgba(168, 85, 247, 0.15); color: var(--accent-purple); border: 1px solid rgba(168, 85, 247, 0.35); }
+    .badge-user { background: rgba(6, 182, 212, 0.15); color: var(--accent-cyan); border: 1px solid rgba(6, 182, 212, 0.35); }
+
+    /* Form Controls & Buttons */
+    .form-control {
+      background: rgba(7, 10, 20, 0.7);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 0.65rem 0.95rem;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      width: 100%;
+      outline: none;
+      font-family: inherit;
+    }
+    .form-control:focus {
+      border-color: var(--primary-glow);
+      box-shadow: 0 0 10px rgba(99, 102, 241, 0.3);
+    }
+    .btn {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      padding: 0.55rem 1.1rem;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.84rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      transition: all 0.2s;
+    }
+    .btn:hover { background: var(--primary-glow); transform: translateY(-1px); }
+    .btn-sm { padding: 0.32rem 0.65rem; font-size: 0.76rem; border-radius: 7px; }
+    .btn-danger { background: var(--accent-rose); }
+    .btn-danger:hover { background: #e11d48; }
+    .btn-secondary { background: rgba(255, 255, 255, 0.06); border: 1px solid var(--border-color); color: var(--text-main); }
+    .btn-secondary:hover { background: rgba(255, 255, 255, 0.12); }
+
+    /* Toast Notification */
+    #toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: #0f172a;
+      border: 1px solid var(--primary);
+      color: #fff;
+      padding: 0.75rem 1.4rem;
+      border-radius: 12px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      display: none;
+      z-index: 100;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Super Admin Header -->
+  <header>
+    <div class="brand">
+      <div class="brand-icon">🛡️</div>
+      <div>
+        <div style="display: flex; align-items: center;">
+          <span class="brand-title">TaskMeter Studio</span>
+          <span class="admin-pill">Master Admin</span>
+        </div>
+        <div style="font-size: 0.72rem; color: var(--text-muted);">Confidential Management Subsystem</div>
+      </div>
+    </div>
+
+    <div class="admin-nav" id="admin-nav-bar" style="display: none;">
+      <button class="admin-nav-btn active" onclick="switchAdminTab('users')">👥 User Directory</button>
+      <button class="admin-nav-btn" onclick="switchAdminTab('emails')">📬 Email Dispatch Audit</button>
+      <button class="admin-nav-btn" onclick="switchAdminTab('telemetry')">📊 System Overview</button>
+    </div>
+
+    <div style="display: flex; gap: 0.5rem; align-items: center;">
+      <span id="admin-user-tag" style="font-size: 0.82rem; font-weight: 700; color: var(--accent-rose); display: none;">Super Admin</span>
+      <button class="btn btn-secondary btn-sm" id="admin-signout-btn" style="display: none;" onclick="handleAdminSignOut()">Log Out</button>
+      <a href="/" class="btn btn-secondary btn-sm" style="text-decoration: none;">Launch Public App ↗</a>
+    </div>
+  </header>
+
+  <main>
+    <!-- GATE: ADMIN AUTHENTICATION -->
+    <div id="admin-auth-gate">
+      <div style="text-align: center; margin-bottom: 1.5rem;">
+        <div style="font-size: 2.2rem; margin-bottom: 0.5rem;">🔐</div>
+        <h2 style="font-size: 1.35rem; font-weight: 800;">Administrator Gateway</h2>
+        <p style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.25rem;">
+          Restricted access. Super-Administrator credentials required.
+        </p>
+      </div>
+
+      <form onsubmit="handleAdminLogin(event)">
+        <div style="margin-bottom: 1rem;">
+          <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Admin Email</label>
+          <input type="email" id="gate-email" class="form-control" required placeholder="admin@taskmeter.online" value="admin@taskmeter.online">
+        </div>
+        <div style="margin-bottom: 1.5rem;">
+          <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Password</label>
+          <input type="password" id="gate-password" class="form-control" required placeholder="••••••••••••" value="AdminMaster2026!">
+        </div>
+        <button type="submit" class="btn btn-danger" style="width: 100%; justify-content: center; padding: 0.75rem;">
+          Authenticate Master Session
+        </button>
+      </form>
+    </div>
+
+    <!-- MAIN ADMIN DASHBOARD VIEW (Shown after Auth) -->
+    <div id="admin-dashboard-view" style="display: none;">
+      <!-- System Telemetry KPI Cards -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">Registered Accounts</div>
+          <div class="kpi-value" id="kpi-users" style="color: var(--primary-glow);">0</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Active Workspaces</div>
+          <div class="kpi-value" id="kpi-projects" style="color: var(--accent-emerald);">0</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Hours Metered</div>
+          <div class="kpi-value" id="kpi-hours" style="color: var(--accent-cyan);">0.0h</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Emails Dispatched</div>
+          <div class="kpi-value" id="kpi-emails" style="color: var(--accent-purple);">0</div>
+        </div>
+      </div>
+
+      <!-- TAB 1: USER MANAGEMENT DIRECTORY -->
+      <div id="admin-tab-users" class="data-card">
+        <div class="data-header">
+          <div>
+            <h3 style="font-size: 1.15rem; font-weight: 800;">User &amp; Workspace Directory</h3>
+            <p style="font-size: 0.8rem; color: var(--text-muted);">Manage member privileges, workspace modes, account suspensions, and data purging.</p>
+          </div>
+          <div style="display: flex; gap: 0.5rem;">
+            <input type="text" id="user-search" class="form-control" placeholder="Search by name or email..." style="width: 240px;" oninput="renderUsersTable()">
+            <button class="btn btn-secondary btn-sm" onclick="loadAdminData()">🔄 Refresh</button>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>User / Email</th>
+                <th>Role</th>
+                <th>Workspaces</th>
+                <th>Access Level</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="users-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB 2: EMAIL DISPATCH LOGS AUDIT -->
+      <div id="admin-tab-emails" class="data-card" style="display: none;">
+        <div class="data-header">
+          <div>
+            <h3 style="font-size: 1.15rem; font-weight: 800;">Dispatched Email Audit Ledger</h3>
+            <p style="font-size: 0.8rem; color: var(--text-muted);">Real-time log of welcome notes, password reset tokens, and notifications.</p>
+          </div>
+          <div style="display: flex; gap: 0.5rem;">
+            <button class="btn btn-secondary btn-sm" onclick="openTestEmailModal()">✉️ Dispatch Test Email</button>
+            <button class="btn btn-secondary btn-sm" onclick="loadEmailLogs()">🔄 Refresh Logs</button>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Mail ID</th>
+                <th>Recipient</th>
+                <th>Subject Line</th>
+                <th>Sent At</th>
+                <th>Delivery Status</th>
+                <th>Preview Content</th>
+              </tr>
+            </thead>
+            <tbody id="emails-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB 3: SYSTEM TELEMETRY -->
+      <div id="admin-tab-telemetry" class="data-card" style="display: none;">
+        <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 0.5rem;">System Configuration &amp; Health</h3>
+        <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1.5rem;">Active server parameters and environmental variables.</p>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem;">
+          <div style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.25rem;">
+            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Storage Subsystem</div>
+            <div style="font-size: 1.1rem; font-weight: 700; margin-top: 0.35rem; color: var(--accent-emerald);">SQLite3 (data.db)</div>
+            <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.2rem;">Relational persistent storage with foreign keys.</div>
+          </div>
+
+          <div style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.25rem;">
+            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Email Transport</div>
+            <div style="font-size: 1.1rem; font-weight: 700; margin-top: 0.35rem; color: var(--primary-glow);">Nodemailer Engine</div>
+            <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.2rem;">Integrated SMTP handler with persistent audit logging.</div>
+          </div>
+
+          <div style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.25rem;">
+            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Authentication Security</div>
+            <div style="font-size: 1.1rem; font-weight: 700; margin-top: 0.35rem; color: var(--accent-purple);">Bcrypt + JWT (30-Day Expiry)</div>
+            <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.2rem;">Cryptographic hash verification with 1-hour password reset tokens.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal: Email Preview Detail -->
+  <div id="email-preview-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); z-index: 99; align-items: center; justify-content: center;">
+    <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; max-width: 600px; width: 90%; max-height: 80vh; display: flex; flex-direction: column; overflow: hidden;">
+      <div style="padding: 1rem 1.5rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+        <h3 id="modal-email-subject" style="font-size: 1rem; font-weight: 700;">Email Inspection</h3>
+        <button class="btn btn-secondary btn-sm" onclick="closeEmailPreview()">&times;</button>
+      </div>
+      <div id="modal-email-body" style="padding: 1.5rem; overflow-y: auto; background: #fff; color: #000; flex: 1;"></div>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+
+  <script>
+    let adminToken = localStorage.getItem('taskmeter_admin_token') || null;
+    let allUsers = [];
+    let allEmails = [];
+
+    // Initialize View
+    window.addEventListener('DOMContentLoaded', () => {
+      if (adminToken) {
+        verifyAdminSession();
+      } else {
+        showAuthGate();
+      }
+    });
+
+    async function handleAdminLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('gate-email').value.trim();
+      const password = document.getElementById('gate-password').value;
+
+      try {
+        const res = await fetch('/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+
+        if (!res.ok || !data.ok) {
+          showToast(data.error || 'Authentication failed');
+          return;
+        }
+
+        if (data.user?.is_admin !== 1) {
+          showToast('Account is authenticated but does not possess Super-Admin privileges.');
+          return;
+        }
+
+        adminToken = data.token;
+        localStorage.setItem('taskmeter_admin_token', adminToken);
+        showDashboard();
+        loadAdminData();
+        showToast('Super-Administrator session established.');
+      } catch (err) {
+        showToast('Server communication error: ' + err.message);
+      }
+    }
+
+    async function verifyAdminSession() {
+      try {
+        const res = await fetch('/api/admin/overview', {
+          headers: { 'Authorization': `Bearer ${adminToken}` }
+        });
+        if (res.ok) {
+          showDashboard();
+          loadAdminData();
+        } else {
+          handleAdminSignOut();
+        }
+      } catch {
+        handleAdminSignOut();
+      }
+    }
+
+    function showDashboard() {
+      document.getElementById('admin-auth-gate').style.display = 'none';
+      document.getElementById('admin-dashboard-view').style.display = 'block';
+      document.getElementById('admin-nav-bar').style.display = 'flex';
+      document.getElementById('admin-user-tag').style.display = 'inline-block';
+      document.getElementById('admin-signout-btn').style.display = 'inline-flex';
+    }
+
+    function showAuthGate() {
+      document.getElementById('admin-auth-gate').style.display = 'block';
+      document.getElementById('admin-dashboard-view').style.display = 'none';
+      document.getElementById('admin-nav-bar').style.display = 'none';
+      document.getElementById('admin-user-tag').style.display = 'none';
+      document.getElementById('admin-signout-btn').style.display = 'none';
+    }
+
+    function handleAdminSignOut() {
+      adminToken = null;
+      localStorage.removeItem('taskmeter_admin_token');
+      showAuthGate();
+      showToast('Signed out of administrative console.');
+    }
+
+    function switchAdminTab(tab) {
+      ['users', 'emails', 'telemetry'].forEach(t => {
+        document.getElementById(`admin-tab-${t}`).style.display = (t === tab) ? 'block' : 'none';
+      });
+      document.querySelectorAll('.admin-nav-btn').forEach((btn, idx) => {
+        btn.classList.toggle('active', ['users', 'emails', 'telemetry'][idx] === tab);
+      });
+      if (tab === 'emails') loadEmailLogs();
+    }
+
+    async function loadAdminData() {
+      try {
+        // Fetch KPIs
+        const kpiRes = await fetch('/api/admin/overview', {
+          headers: { 'Authorization': `Bearer ${adminToken}` }
+        });
+        const kpiData = await kpiRes.json();
+        if (kpiData.ok) {
+          document.getElementById('kpi-users').innerText = kpiData.kpis.usersCount;
+          document.getElementById('kpi-projects').innerText = kpiData.kpis.projectsCount;
+          document.getElementById('kpi-hours').innerText = `${kpiData.kpis.hoursMetered}h`;
+          document.getElementById('kpi-emails').innerText = kpiData.kpis.emailsDispatched;
+        }
+
+        // Fetch Users
+        const userRes = await fetch('/api/admin/users', {
+          headers: { 'Authorization': `Bearer ${adminToken}` }
+        });
+        const userData = await userRes.json();
+        if (userData.ok) {
+          allUsers = userData.users;
+          renderUsersTable();
+        }
+      } catch (err) {
+        showToast('Error loading telemetry: ' + err.message);
+      }
+    }
+
+    function renderUsersTable() {
+      const q = (document.getElementById('user-search')?.value || '').toLowerCase().trim();
+      const tbody = document.getElementById('users-tbody');
+      if (!tbody) return;
+
+      const filtered = allUsers.filter(u =>
+        (u.name || '').toLowerCase().includes(q) ||
+        (u.email || '').toLowerCase().includes(q)
+      );
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:2rem; color:var(--text-muted);">No accounts match criteria.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(u => {
+        const dateStr = u.created_at ? new Date(u.created_at).toLocaleDateString() : 'N/A';
+        const isAdm = u.is_admin === 1;
+        const isSuspended = u.status === 'suspended';
+
+        return `
+          <tr>
+            <td style="font-family:var(--font-mono); font-size:0.78rem;">#${u.id}</td>
+            <td>
+              <div style="font-weight:700;">${escapeHtml(u.name || 'Unnamed')}</div>
+              <div style="font-size:0.75rem; color:var(--text-muted);">${escapeHtml(u.email)}</div>
+            </td>
+            <td>
+              <span class="badge ${u.role === 'agency' ? 'badge-admin' : 'badge-user'}">${u.role || 'freelancer'}</span>
+            </td>
+            <td style="font-family:var(--font-mono); font-weight:700;">${u.projectCount || 0}</td>
+            <td>
+              <span class="badge ${isAdm ? 'badge-admin' : 'badge-user'}">${isAdm ? 'Super Admin' : 'Standard'}</span>
+            </td>
+            <td>
+              <span class="badge ${isSuspended ? 'badge-suspended' : 'badge-active'}">${u.status || 'active'}</span>
+            </td>
+            <td style="font-size:0.78rem; color:var(--text-muted);">${dateStr}</td>
+            <td>
+              <div style="display:flex; gap:0.35rem;">
+                <button class="btn btn-secondary btn-sm" onclick="toggleUserAdmin(${u.id}, ${isAdm ? 0 : 1})" title="${isAdm ? 'Revoke Admin' : 'Grant Admin'}">
+                  ${isAdm ? 'Demote' : 'Make Admin'}
+                </button>
+                <button class="btn ${isSuspended ? 'btn-secondary' : 'btn-danger'} btn-sm" onclick="toggleUserStatus(${u.id}, '${isSuspended ? 'active' : 'suspended'}')">
+                  ${isSuspended ? 'Unsuspend' : 'Suspend'}
+                </button>
+                <button class="btn btn-secondary btn-sm" style="color:var(--accent-rose);" onclick="deleteUserAccount(${u.id})">
+                  Purge
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    async function toggleUserAdmin(userId, targetAdmin) {
+      if (!confirm(`Are you sure you want to ${targetAdmin ? 'grant' : 'revoke'} administrator privileges for this user?`)) return;
+      try {
+        const res = await fetch(`/api/admin/users/${userId}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${adminToken}`
+          },
+          body: JSON.stringify({ is_admin: targetAdmin })
+        });
+        const d = await res.json();
+        if (d.ok) {
+          showToast('User administrator status updated');
+          loadAdminData();
+        } else {
+          showToast(d.error || 'Update failed');
+        }
+      } catch (err) {
+        showToast(err.message);
+      }
+    }
+
+    async function toggleUserStatus(userId, targetStatus) {
+      try {
+        const res = await fetch(`/api/admin/users/${userId}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${adminToken}`
+          },
+          body: JSON.stringify({ status: targetStatus })
+        });
+        const d = await res.json();
+        if (d.ok) {
+          showToast(`Account status set to: ${targetStatus}`);
+          loadAdminData();
+        } else {
+          showToast(d.error || 'Update failed');
+        }
+      } catch (err) {
+        showToast(err.message);
+      }
+    }
+
+    async function deleteUserAccount(userId) {
+      if (!confirm(`CAUTION: Permanently delete this account and all connected projects, time entries, and invoices?`)) return;
+      try {
+        const res = await fetch(`/api/admin/users/${userId}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${adminToken}` }
+        });
+        const d = await res.json();
+        if (d.ok) {
+          showToast('Account and workspace purged.');
+          loadAdminData();
+        } else {
+          showToast(d.error || 'Deletion failed');
+        }
+      } catch (err) {
+        showToast(err.message);
+      }
+    }
+
+    async function loadEmailLogs() {
+      try {
+        const res = await fetch('/api/admin/emails', {
+          headers: { 'Authorization': `Bearer ${adminToken}` }
+        });
+        const data = await res.json();
+        if (data.ok) {
+          allEmails = data.logs;
+          renderEmailsTable();
+        }
+      } catch (err) {
+        showToast('Error loading email logs: ' + err.message);
+      }
+    }
+
+    function renderEmailsTable() {
+      const tbody = document.getElementById('emails-tbody');
+      if (!tbody) return;
+
+      if (allEmails.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:2rem; color:var(--text-muted);">No emails dispatched yet.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = allEmails.map(m => `
+        <tr>
+          <td style="font-family:var(--font-mono); font-size:0.75rem;">${m.mail_id}</td>
+          <td><strong>${escapeHtml(m.recipient)}</strong></td>
+          <td>${escapeHtml(m.subject)}</td>
+          <td style="font-size:0.78rem; color:var(--text-muted);">${new Date(m.sent_at).toLocaleString()}</td>
+          <td><span class="badge badge-active">${m.status}</span></td>
+          <td>
+            <button class="btn btn-secondary btn-sm" onclick="inspectEmail('${m.mail_id}')">View HTML</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function inspectEmail(mailId) {
+      const item = allEmails.find(e => e.mail_id === mailId);
+      if (!item) return;
+
+      document.getElementById('modal-email-subject').innerText = item.subject;
+      document.getElementById('modal-email-body').innerHTML = item.body_html || '<p>No HTML body</p>';
+      document.getElementById('email-preview-modal').style.display = 'flex';
+    }
+
+    function closeEmailPreview() {
+      document.getElementById('email-preview-modal').style.display = 'none';
+    }
+
+    async function openTestEmailModal() {
+      const to = prompt('Recipient email for test dispatch:', 'you@example.com');
+      if (!to) return;
+
+      try {
+        const res = await fetch('/api/admin/send-email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${adminToken}`
+          },
+          body: JSON.stringify({
+            to,
+            subject: 'TaskMeter System Verification Dispatch ⚡',
+            html: `<h3>TaskMeter Administrative Test</h3><p>This email confirms your TaskMeter backend dispatch pipeline is functional!</p>`
+          })
+        });
+        const d = await res.json();
+        if (d.ok) {
+          showToast(`Test dispatch logged to ${to}!`);
+          loadEmailLogs();
+        }
+      } catch (err) {
+        showToast('Failed to dispatch test email');
+      }
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.innerText = msg;
+      t.style.display = 'block';
+      setTimeout(() => { t.style.display = 'none'; }, 3200);
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[m]);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <!-- Background Gradient (Indigo to Violet) -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="50%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#a855f7"/>
+    </linearGradient>
+
+    <!-- Glowing Rim Gradient -->
+    <linearGradient id="rimGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.05"/>
+    </linearGradient>
+
+    <!-- Emerald Dial Gradient -->
+    <linearGradient id="emeraldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#34d399"/>
+      <stop offset="100%" stop-color="#10b981"/>
+    </linearGradient>
+
+    <!-- Outer Soft Glow -->
+    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#6366f1" flood-opacity="0.45"/>
+    </filter>
+  </defs>
+
+  <!-- Squircle Base with App Icon Styling -->
+  <rect x="2" y="2" width="60" height="60" rx="16" fill="url(#bgGrad)" filter="url(#softGlow)"/>
+  <rect x="2" y="2" width="60" height="60" rx="16" fill="none" stroke="url(#rimGrad)" stroke-width="1.5"/>
+
+  <!-- Clock Outer Track (Subtle Translucent Rim) -->
+  <circle cx="32" cy="32" r="20" fill="none" stroke="#ffffff" stroke-opacity="0.18" stroke-width="4"/>
+
+  <!-- Active Meter Progress Arc -->
+  <path d="M 32 12 A 20 20 0 1 1 17.85 46.14" fill="none" stroke="#ffffff" stroke-width="4.5" stroke-linecap="round"/>
+
+  <!-- Meter Accent Pulse (Emerald Active Pip at top) -->
+  <circle cx="32" cy="12" r="3.2" fill="url(#emeraldGrad)"/>
+
+  <!-- Clock Hands with Chamfered Precision Styling -->
+  <line x1="32" y1="32" x2="32" y2="20" stroke="#ffffff" stroke-width="4.5" stroke-linecap="round"/>
+  <polyline points="32 32 42.5 37" fill="none" stroke="url(#emeraldGrad)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Center Pivot Pin -->
+  <circle cx="32" cy="32" r="3.5" fill="#ffffff"/>
+  <circle cx="32" cy="32" r="1.5" fill="#6366f1"/>
+</svg>
