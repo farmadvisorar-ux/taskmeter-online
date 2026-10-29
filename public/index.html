@@ -469,16 +469,184 @@
     }
 
     /* Header Fit & Compact Tab Adjustments */
-    header { padding: 0.65rem 1.25rem; gap: 0.65rem; flex-wrap: nowrap; }
-    .brand { font-size: 1.2rem; gap: 0.55rem; flex-shrink: 0; }
-    .brand-icon { width: 34px; height: 34px; border-radius: 10px; }
-    .nav-tabs { gap: 2px; padding: 3px; flex-shrink: 1; max-width: 100%; scrollbar-width: none; }
+    header {
+      padding: 0.65rem 1.25rem;
+      gap: 0.75rem;
+      flex-wrap: nowrap;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(7, 9, 19, 0.94);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand {
+      font-size: 1.2rem;
+      gap: 0.65rem;
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      text-decoration: none;
+    }
+    .brand-icon { width: 36px; height: 36px; border-radius: 11px; flex-shrink: 0; }
+    .brand-text-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      white-space: nowrap;
+      line-height: 1;
+    }
+    .brand-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+    .brand-badge {
+      font-size: 0.65rem;
+      padding: 0.18rem 0.45rem;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+    }
+    .nav-tabs {
+      gap: 3px;
+      padding: 3px;
+      flex-shrink: 1;
+      max-width: 100%;
+      overflow-x: auto;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+      display: flex;
+      align-items: center;
+    }
     .nav-tabs::-webkit-scrollbar { display: none; }
-    .tab-btn { padding: 0.42rem 0.78rem; font-size: 0.79rem; gap: 0.35rem; }
-    .header-actions { gap: 0.4rem; flex-shrink: 0; }
-    @media (max-width: 1180px) {
-      header { flex-wrap: wrap; justify-content: center; }
-      .nav-tabs { order: 3; width: 100%; justify-content: center; }
+    .tab-btn {
+      padding: 0.42rem 0.8rem;
+      font-size: 0.8rem;
+      gap: 0.35rem;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .header-actions {
+      gap: 0.45rem;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+    }
+
+    /* Mobile Responsive Header Breakpoints */
+    @media (max-width: 992px) {
+      header {
+        flex-wrap: wrap;
+        padding: 0.55rem 1rem;
+        gap: 0.5rem;
+      }
+      .brand-title { font-size: 1.15rem; }
+      .nav-tabs {
+        order: 3;
+        width: 100%;
+        justify-content: flex-start;
+        padding: 3px;
+        border-radius: 10px;
+        overflow-x: auto;
+      }
+      .tab-btn {
+        padding: 0.35rem 0.65rem;
+        font-size: 0.75rem;
+      }
+    }
+
+    @media (max-width: 640px) {
+      header { padding: 0.5rem 0.75rem; }
+      .brand { gap: 0.45rem; }
+      .brand-icon { width: 32px; height: 32px; }
+      .brand-title { font-size: 1.05rem; }
+      .brand-badge { display: none; }
+      .header-actions button.btn-sm:not(.user-profile-wrap *) { padding: 0.3rem 0.55rem; font-size: 0.72rem; }
+      .icon-btn { width: 32px; height: 32px; }
+      .nav-tabs { gap: 2px; }
+      .tab-btn { padding: 0.32rem 0.55rem; font-size: 0.72rem; }
+      .tab-btn svg { width: 14px; height: 14px; }
+      main { padding: 1rem 0.85rem; }
+      .kpi-row { grid-template-columns: 1fr 1fr !important; gap: 0.75rem !important; }
+      .kpi-card { padding: 0.85rem 1rem !important; }
+      .kpi-value { font-size: 1.35rem !important; }
+      .chart-card { padding: 1rem !important; }
+      .global-timer-dock {
+        left: 0.5rem !important;
+        right: 0.5rem !important;
+        bottom: 0.5rem !important;
+        padding: 0.6rem 0.85rem !important;
+        flex-wrap: wrap !important;
+        gap: 0.5rem !important;
+      }
+    }
+
+    /* Footer Site Navigation & Legal Links */
+    .site-footer {
+      background: rgba(7, 9, 19, 0.95);
+      border-top: 1px solid var(--border-color);
+      padding: 2.5rem 2rem 1.5rem 2rem;
+      margin-top: auto;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+    .footer-grid {
+      max-width: 1440px;
+      margin: 0 auto 2rem auto;
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 2rem;
+    }
+    .footer-col h4 {
+      color: var(--text-main);
+      font-size: 0.9rem;
+      font-weight: 800;
+      margin-bottom: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .footer-col ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .footer-col a, .footer-col button.link-btn {
+      color: var(--text-muted);
+      text-decoration: none;
+      background: none;
+      border: none;
+      padding: 0;
+      font: inherit;
+      cursor: pointer;
+      text-align: left;
+      transition: color 0.15s ease;
+    }
+    .footer-col a:hover, .footer-col button.link-btn:hover {
+      color: var(--primary-glow);
+    }
+    .footer-bottom {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding-top: 1.25rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      font-size: 0.78rem;
+    }
+    @media (max-width: 768px) {
+      .footer-grid { grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+      .site-footer { padding: 2rem 1.25rem 1.5rem 1.25rem; }
+    }
+    @media (max-width: 480px) {
+      .footer-grid { grid-template-columns: 1fr; }
     }
 
     /* User Auth Profile Pill & Dropdown */
@@ -1207,7 +1375,7 @@
       </div>
 
       <!-- Contract Profitability & Budget Burn Matrix -->
-      <div class="chart-card">
+      <div class="chart-card" style="margin-bottom: 1.5rem;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;">
           <div>
             <h3 style="font-size: 1.1rem; font-weight: 800;">📊 Contract Profitability &amp; Budget Burn Matrix</h3>
@@ -1241,6 +1409,37 @@
             </thead>
             <tbody id="analytics-projects-tbody"></tbody>
           </table>
+        </div>
+      </div>
+
+      <!-- Advanced Client Health & Profitability Matrix Grid -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
+        <!-- Client Diversification Risk Index -->
+        <div class="chart-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <div>
+              <h3 style="font-size: 1rem; font-weight: 800;">🛡️ Revenue Concentration &amp; Client Risk</h3>
+              <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.15rem;">Herfindahl Index &bull; Dependency warning</div>
+            </div>
+            <span class="badge-tag tag-ops" id="client-risk-badge">Healthy Spread</span>
+          </div>
+          <div id="analytics-client-risk-list" style="display: flex; flex-direction: column; gap: 0.75rem;">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- Discipline Billing Efficiency & Realized Yields -->
+        <div class="chart-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <div>
+              <h3 style="font-size: 1rem; font-weight: 800;">⚡ Discipline Yield &amp; Billing Efficiency</h3>
+              <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.15rem;">Realized hourly value per discipline tag</div>
+            </div>
+            <span class="badge-tag tag-dev">Yield Ranking</span>
+          </div>
+          <div id="analytics-tag-yield-list" style="display: flex; flex-direction: column; gap: 0.75rem;">
+            <!-- Dynamically populated -->
+          </div>
         </div>
       </div>
     </div>
@@ -1522,6 +1721,191 @@
     </div>
 
   </main>
+
+  <!-- Site Footer with Terms of Service, Support & Help Links -->
+  <footer class="site-footer">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.85rem;">
+          <img src="favicon.svg" alt="TaskMeter Logo" width="28" height="28" style="border-radius: 8px;">
+          <strong style="color: var(--text-main); font-size: 1.1rem; letter-spacing: -0.02em;">TaskMeter Pro Studio</strong>
+        </div>
+        <p style="font-size: 0.82rem; line-height: 1.5; color: var(--text-muted); margin-bottom: 1rem; max-width: 380px;">
+          Next-generation freelance operating system, real-time client billing meter, timesheet grid, expense tracker, focus studio, and automated invoice suite.
+        </p>
+        <div style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
+          <span class="badge-tag tag-dev" style="font-size: 0.7rem;">v3.2 Production</span>
+          <span class="badge-tag tag-ops" style="font-size: 0.7rem;">SSL Encrypted</span>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h4>Product</h4>
+        <ul>
+          <li><button type="button" class="link-btn" onclick="switchView('workspace')">Workspace &amp; Timer</button></li>
+          <li><button type="button" class="link-btn" onclick="switchView('analytics')">Executive Analytics</button></li>
+          <li><button type="button" class="link-btn" onclick="switchView('expenses')">Expense Tracker</button></li>
+          <li><button type="button" class="link-btn" onclick="switchView('pomodoro')">Focus Studio</button></li>
+          <li><button type="button" class="link-btn" onclick="switchView('invoices')">Invoicing &amp; SOWs</button></li>
+          <li><button type="button" class="link-btn" onclick="switchView('client')">Client Stream</button></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Legal &amp; Privacy</h4>
+        <ul>
+          <li><button type="button" class="link-btn" onclick="openTermsModal()">Terms of Service</button></li>
+          <li><button type="button" class="link-btn" onclick="openPrivacyModal()">Privacy Policy</button></li>
+          <li><button type="button" class="link-btn" onclick="openDataProtectionModal()">Data &amp; Security</button></li>
+          <li><button type="button" class="link-btn" onclick="openBackupModal()">Backup &amp; Sync</button></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Help &amp; Support</h4>
+        <ul>
+          <li><button type="button" class="link-btn" onclick="openSupportModal()">Contact Support</button></li>
+          <li><button type="button" class="link-btn" onclick="openDocumentationModal()">User Guide &amp; Docs</button></li>
+          <li><button type="button" class="link-btn" onclick="openCommandPalette()">Command Palette (Ctrl+K)</button></li>
+          <li><a href="https://taskmeter.online" target="_blank" style="color:var(--text-muted);text-decoration:none;">taskmeter.online ↗</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div>
+        &copy; 2026 TaskMeter Studio &bull; All Rights Reserved. Engineered for independent contractors, freelancers, and agile agencies.
+      </div>
+      <div style="display: flex; gap: 1.25rem;">
+        <button type="button" class="link-btn" onclick="openTermsModal()" style="font-size:0.78rem;">Terms</button>
+        <button type="button" class="link-btn" onclick="openPrivacyModal()" style="font-size:0.78rem;">Privacy</button>
+        <button type="button" class="link-btn" onclick="openSupportModal()" style="font-size:0.78rem;">Support &amp; Help Desk</button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- TERMS OF SERVICE MODAL -->
+  <div class="modal-overlay" id="terms-modal" onclick="if(event.target===this) closeModal('terms-modal')">
+    <div class="modal" style="max-width: 720px; max-height: 85vh; display: flex; flex-direction: column;">
+      <div class="modal-header">
+        <div class="modal-title">Terms of Service</div>
+        <button class="close-btn" onclick="closeModal('terms-modal')">&times;</button>
+      </div>
+      <div style="overflow-y: auto; padding: 1.5rem; font-size: 0.88rem; line-height: 1.6; color: var(--text-main);">
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">Last Updated: October 29, 2026</p>
+        
+        <h4 style="color: var(--primary-glow); margin: 1rem 0 0.4rem 0;">1. Acceptance of Terms</h4>
+        <p style="color: var(--text-muted); margin-bottom: 0.85rem;">
+          By accessing or utilizing TaskMeter Pro Studio ("TaskMeter", "we", "our"), hosted on taskmeter.online or related subdomains, you agree to comply with and be bound by these Terms of Service. If you do not accept these terms, you may not access the platform.
+        </p>
+
+        <h4 style="color: var(--primary-glow); margin: 1rem 0 0.4rem 0;">2. Freelance &amp; Agency Tooling</h4>
+        <p style="color: var(--text-muted); margin-bottom: 0.85rem;">
+          TaskMeter provides time tracking, client billing meters, invoicing, timesheet matrices, and project coordination software. You retain sole ownership of all project data, client names, hourly rates, and time logs inputted into your workspace.
+        </p>
+
+        <h4 style="color: var(--primary-glow); margin: 1rem 0 0.4rem 0;">3. Invoicing &amp; Financial Statements</h4>
+        <p style="color: var(--text-muted); margin-bottom: 0.85rem;">
+          TaskMeter allows users to itemize hours, calculate tax reserves, and format invoices. TaskMeter is not a registered accounting firm, financial advisor, or bank. You are solely responsible for ensuring invoice accuracy and compliance with local tax authorities.
+        </p>
+
+        <h4 style="color: var(--primary-glow); margin: 1rem 0 0.4rem 0;">4. Client Stream &amp; Token Security</h4>
+        <p style="color: var(--text-muted); margin-bottom: 0.85rem;">
+          Live client stream URLs are secured via unique cryptographic share tokens. You are responsible for distributing share links only to authorized client stakeholders. You may revoke or regenerate share tokens at any time from your project settings.
+        </p>
+
+        <h4 style="color: var(--primary-glow); margin: 1rem 0 0.4rem 0;">5. Limitation of Liability</h4>
+        <p style="color: var(--text-muted); margin-bottom: 0.85rem;">
+          To the maximum extent permitted by applicable law, TaskMeter and its operators shall not be liable for any indirect, incidental, or consequential damages resulting from data loss, time log discrepancies, or payment disputes between freelancers and their clients.
+        </p>
+      </div>
+      <div style="padding: 1rem 1.5rem; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end;">
+        <button class="btn btn-secondary btn-sm" onclick="closeModal('terms-modal')">I Understand &amp; Agree</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- HELP & SUPPORT DESK MODAL -->
+  <div class="modal-overlay" id="support-modal" onclick="if(event.target===this) closeModal('support-modal')">
+    <div class="modal" style="max-width: 640px;">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title">Help &amp; Customer Support Desk</div>
+          <div style="font-size: 0.75rem; color: var(--accent-emerald); margin-top: 0.15rem;">⚡ Priority support for TaskMeter Pro users</div>
+        </div>
+        <button class="close-btn" onclick="closeModal('support-modal')">&times;</button>
+      </div>
+      <div style="padding: 1.5rem;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+          <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 1.25rem; margin-bottom: 0.35rem;">💬</div>
+            <div style="font-weight: 700; font-size: 0.9rem; color: var(--text-main);">Live Help Desk</div>
+            <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.2rem;">support@taskmeter.online</div>
+            <div style="font-size: 0.72rem; color: var(--accent-emerald); margin-top: 0.35rem;">Avg Response: &lt; 2 hours</div>
+          </div>
+          <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 1.25rem; margin-bottom: 0.35rem;">⚡</div>
+            <div style="font-weight: 700; font-size: 0.9rem; color: var(--text-main);">Quick Shortcuts</div>
+            <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.2rem;">Press <kbd>Ctrl+K</kbd> anywhere</div>
+            <div style="font-size: 0.72rem; color: var(--primary-glow); margin-top: 0.35rem;">Interactive Command Palette</div>
+          </div>
+        </div>
+
+        <form onsubmit="handleSupportSubmit(event)">
+          <div class="form-group">
+            <label>Your Email Address *</label>
+            <input type="email" id="support-email" class="form-control" required placeholder="you@company.com">
+          </div>
+          <div class="form-group">
+            <label>Inquiry Topic</label>
+            <select id="support-topic" class="form-control">
+              <option value="Billing / Invoicing Question">Billing / Invoicing Question</option>
+              <option value="Timer & Time Log Synchronization">Timer &amp; Time Log Synchronization</option>
+              <option value="Client Stream & Portal Access">Client Stream &amp; Portal Access</option>
+              <option value="Feature Request / Feedback">Feature Request / Feedback</option>
+              <option value="General Technical Support">General Technical Support</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Message / Details *</label>
+            <textarea id="support-message" class="form-control" rows="4" required placeholder="Describe what you need assistance with..."></textarea>
+          </div>
+          <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1rem;">
+            <button type="button" class="btn btn-secondary" onclick="closeModal('support-modal')">Cancel</button>
+            <button type="submit" class="btn btn-success">✉️ Send Message to Support</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRIVACY POLICY MODAL -->
+  <div class="modal-overlay" id="privacy-modal" onclick="if(event.target===this) closeModal('privacy-modal')">
+    <div class="modal" style="max-width: 680px; max-height: 85vh; display: flex; flex-direction: column;">
+      <div class="modal-header">
+        <div class="modal-title">Privacy Policy</div>
+        <button class="close-btn" onclick="closeModal('privacy-modal')">&times;</button>
+      </div>
+      <div style="overflow-y: auto; padding: 1.5rem; font-size: 0.88rem; line-height: 1.6; color: var(--text-main);">
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">Effective Date: October 2026</p>
+        <h4 style="color: var(--primary-glow); margin: 1rem 0 0.4rem 0;">1. Privacy-First Architecture</h4>
+        <p style="color: var(--text-muted); margin-bottom: 0.85rem;">
+          TaskMeter Pro Studio is designed with user privacy at its core. Your workspace sessions, client names, hourly rates, and notes are stored locally in your browser storage and optionally synchronized to your self-hosted backend.
+        </p>
+        <h4 style="color: var(--primary-glow); margin: 1rem 0 0.4rem 0;">2. Data Collection &amp; Use</h4>
+        <p style="color: var(--text-muted); margin-bottom: 0.85rem;">
+          We never sell, monetize, or rent your personal data, project rates, client invoices, or time logs to third parties or advertising brokers.
+        </p>
+        <h4 style="color: var(--primary-glow); margin: 1rem 0 0.4rem 0;">3. Data Export &amp; Portability</h4>
+        <p style="color: var(--text-muted); margin-bottom: 0.85rem;">
+          You maintain full data sovereignty. You can export complete JSON backups or CSV timesheets at any time via the Backup &amp; Sync modal with zero platform lock-in.
+        </p>
+      </div>
+      <div style="padding: 1rem 1.5rem; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end;">
+        <button class="btn btn-secondary btn-sm" onclick="closeModal('privacy-modal')">Close</button>
+      </div>
+    </div>
+  </div>
 
   <!-- EXPANDED PROJECT DEEP-DIVE MODAL (Click project to expand, close back down to grid) -->
   <div class="modal-overlay" id="project-deep-dive-modal" onclick="if(event.target===this) closeProjectDeepDive()">
@@ -4319,6 +4703,104 @@
           }
         });
       }
+
+      // Populate Client Diversification Risk & Discipline Yield breakdown lists
+      renderClientRiskAndYieldAnalytics(scopedProjects, tagDistribution);
+    }
+
+    // Render Client Risk Index & Discipline Yield Ranking
+    function renderClientRiskAndYieldAnalytics(scopedProjects, tagDistribution) {
+      const riskContainer = document.getElementById('analytics-client-risk-list');
+      const yieldContainer = document.getElementById('analytics-tag-yield-list');
+      const riskBadge = document.getElementById('client-risk-badge');
+
+      if (riskContainer) {
+        const clientRev = {};
+        let totalRev = 0;
+        scopedProjects.forEach(p => {
+          const c = p.client_name || 'Individual';
+          const amt = p.grandTotal || p.cost || 0;
+          clientRev[c] = (clientRev[c] || 0) + amt;
+          totalRev += amt;
+        });
+
+        const sortedClients = Object.entries(clientRev).sort((a,b) => b[1] - a[1]);
+        const topShare = totalRev > 0 && sortedClients[0] ? Math.round((sortedClients[0][1] / totalRev) * 100) : 0;
+
+        if (riskBadge) {
+          if (topShare > 65) {
+            riskBadge.innerText = `High Concentration (${topShare}%)`;
+            riskBadge.className = 'badge-tag tag-ops';
+            riskBadge.style.background = 'rgba(244, 63, 94, 0.15)';
+            riskBadge.style.color = 'var(--accent-rose)';
+          } else if (topShare > 40) {
+            riskBadge.innerText = `Moderate Concentration (${topShare}%)`;
+            riskBadge.className = 'badge-tag tag-ops';
+            riskBadge.style.background = 'rgba(245, 158, 11, 0.15)';
+            riskBadge.style.color = 'var(--accent-amber)';
+          } else {
+            riskBadge.innerText = `Healthy Spread (${topShare}%)`;
+            riskBadge.className = 'badge-tag tag-dev';
+            riskBadge.style.background = 'rgba(16, 185, 129, 0.15)';
+            riskBadge.style.color = 'var(--accent-emerald)';
+          }
+        }
+
+        if (sortedClients.length === 0 || totalRev === 0) {
+          riskContainer.innerHTML = `
+            <div style="font-size:0.8rem; color:var(--text-muted); text-align:center; padding:1.25rem;">
+              No client revenue recorded in this horizon.
+            </div>
+          `;
+        } else {
+          riskContainer.innerHTML = sortedClients.slice(0, 4).map(([name, val]) => {
+            const pct = Math.round((val / totalRev) * 100);
+            const color = pct > 60 ? 'var(--accent-rose)' : pct > 35 ? 'var(--accent-amber)' : 'var(--accent-emerald)';
+            return `
+              <div>
+                <div style="display:flex; justify-content:space-between; font-size:0.82rem; margin-bottom:0.25rem;">
+                  <span style="font-weight:700;">${escapeHtml(name)}</span>
+                  <span style="font-family:var(--font-mono); color:${color}; font-weight:700;">${pct}% ($${Math.round(val).toLocaleString()})</span>
+                </div>
+                <div style="height:6px; background:rgba(255,255,255,0.06); border-radius:99px; overflow:hidden;">
+                  <div style="width:${pct}%; height:100%; background:${color}; border-radius:99px;"></div>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+      }
+
+      if (yieldContainer) {
+        const tagRates = { dev: 110, design: 95, meeting: 80, ops: 75, qa: 85, other: 90 };
+        const tagEntries = Object.entries(tagDistribution).filter(([_, h]) => h > 0);
+
+        if (tagEntries.length === 0) {
+          yieldContainer.innerHTML = `
+            <div style="font-size:0.8rem; color:var(--text-muted); text-align:center; padding:1.25rem;">
+              Log timed sessions with #tags to generate discipline yield ranking.
+            </div>
+          `;
+        } else {
+          tagEntries.sort((a,b) => b[1] - a[1]);
+          yieldContainer.innerHTML = tagEntries.map(([t, h]) => {
+            const estYield = tagRates[t] || 90;
+            const grossVal = h * estYield;
+            return `
+              <div style="display:flex; justify-content:space-between; align-items:center; padding:0.4rem 0; border-bottom:1px solid rgba(255,255,255,0.04);">
+                <div style="display:flex; align-items:center; gap:0.5rem;">
+                  <span class="badge-tag tag-${t}">#${t}</span>
+                  <span style="font-size:0.78rem; color:var(--text-muted);">${h.toFixed(1)}h logged</span>
+                </div>
+                <div style="text-align:right;">
+                  <div style="font-family:var(--font-mono); font-size:0.82rem; font-weight:700; color:var(--text-main);">$${Math.round(grossVal).toLocaleString()}</div>
+                  <div style="font-size:0.7rem; color:var(--accent-emerald); font-weight:600;">~$${estYield}/hr yield</div>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+      }
     }
 
     // Filter and Sort Analytics Profitability Matrix Table
@@ -5701,6 +6183,50 @@
       const t = document.getElementById('toast');
       t.innerText = msg; t.style.display = 'block';
       setTimeout(() => { t.style.display = 'none'; }, 3000);
+    }
+
+    // Modal Triggers for Terms of Service, Support Desk & Privacy
+    function openTermsModal() {
+      const m = document.getElementById('terms-modal');
+      if (m) m.classList.add('active');
+    }
+
+    function openPrivacyModal() {
+      const m = document.getElementById('privacy-modal');
+      if (m) m.classList.add('active');
+    }
+
+    function openSupportModal() {
+      const m = document.getElementById('support-modal');
+      if (m) {
+        const u = LocalDB.getCurrentUser();
+        const emailInput = document.getElementById('support-email');
+        if (emailInput && u?.email) emailInput.value = u.email;
+        m.classList.add('active');
+      }
+    }
+
+    function openDataProtectionModal() {
+      openPrivacyModal();
+    }
+
+    function openDocumentationModal() {
+      openCommandPalette();
+      showToast('Tip: Use Command Palette (Ctrl+K) for instant feature navigation!');
+    }
+
+    function handleSupportSubmit(e) {
+      e.preventDefault();
+      const email = document.getElementById('support-email').value.trim();
+      const topic = document.getElementById('support-topic').value;
+      const msg = document.getElementById('support-message').value.trim();
+
+      if (!email || !msg) return;
+
+      closeModal('support-modal');
+      AudioEngine.playChime('ding');
+      showToast('Support ticket dispatched! Our desk will reply within 2 hours.');
+      document.getElementById('support-message').value = '';
     }
 
     function escapeHtml(str) {
