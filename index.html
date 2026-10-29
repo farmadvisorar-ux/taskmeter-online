@@ -5911,28 +5911,27 @@
       const email = document.getElementById('login-email').value.trim().toLowerCase();
       const password = document.getElementById('login-password').value;
 
-      // Try Backend Authentication first
+      // Try Backend Authentication first (if backend running)
       try {
         const res = await fetch('/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, password })
         });
-        const data = await res.json();
-        if (res.ok && data.ok) {
-          localStorage.setItem('taskmeter_auth_token', data.token);
-          LocalDB.setCurrentUser(data.user);
-          updateAuthHeaderUI();
-          closeModal('auth-modal');
-          AudioEngine.playChime('ding');
-          showToast(`Signed in to backend as ${data.user.name || data.user.email}!`);
-          return;
-        } else if (data.error && !data.error.includes('credentials')) {
-          showToast(data.error);
-          return;
+        if (res.ok) {
+          const data = await res.json();
+          if (data.ok) {
+            localStorage.setItem('taskmeter_auth_token', data.token);
+            LocalDB.setCurrentUser(data.user);
+            updateAuthHeaderUI();
+            closeModal('auth-modal');
+            AudioEngine.playChime('ding');
+            showToast(`Signed in as ${data.user.name || data.user.email}!`);
+            return;
+          }
         }
       } catch (backendErr) {
-        // Fallback to local storage DB if backend is offline/standalone
+        // Fallback to local storage DB if static hosting / backend offline
       }
 
       // Offline / Local DB Fallback
