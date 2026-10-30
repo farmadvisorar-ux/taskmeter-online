@@ -880,7 +880,7 @@
   <!-- Top Announcement Bar -->
   <div class="top-banner">
     <div>
-      ⚡ <strong>TaskMeter Pro Studio</strong> is running on <a href="https://taskmeter.online" target="_blank">taskmeter.online</a> &amp; GitHub Pages.
+      ⚡ <strong>TaskMeter Pro Studio</strong> is running on <a href="https://taskmeter.online" target="_blank">taskmeter.online</a>.
     </div>
     <div style="display: flex; gap: 1rem; align-items: center;">
       <span id="demo-indicator" style="cursor: pointer;" onclick="openDemoSwitcher()">⚡ Demo Dataset: <strong>Active</strong></span>
@@ -6183,6 +6183,20 @@
       t.innerText = msg; t.style.display = 'block';
       setTimeout(() => { t.style.display = 'none'; }, 3000);
     }
+
+    // 18-Second Signup Wall Popup Trigger for Unregistered Visitors
+    setTimeout(() => {
+      try {
+        const user = LocalDB.getCurrentUser();
+        const wallShown = sessionStorage.getItem('taskmeter_signup_wall_shown');
+        if (!user && !wallShown) {
+          sessionStorage.setItem('taskmeter_signup_wall_shown', 'true');
+          openAuthModal('signup');
+        }
+      } catch (err) {
+        console.warn('Signup wall trigger:', err);
+      }
+    }, 18000);
 
     // Modal Triggers for Terms of Service, Support Desk & Privacy
     function openTermsModal() {
