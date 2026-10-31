@@ -1,71 +1,89 @@
-﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
   <defs>
-    <!-- Background Gradient: Electric Indigo to Vivid Cyber Purple -->
-    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+    <!-- Multi-Stop Vibrant Gradient: Royal Sapphire -> Electric Indigo -> Cyber Fuchsia -->
+    <linearGradient id="cyberGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#4f46e5"/>
-      <stop offset="45%" stop-color="#7c3aed"/>
-      <stop offset="100%" stop-color="#9333ea"/>
+      <stop offset="48%" stop-color="#7c3aed"/>
+      <stop offset="100%" stop-color="#a855f7"/>
     </linearGradient>
 
-    <!-- Beveled Translucent Rim Highlight -->
-    <linearGradient id="rimGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.5"/>
-      <stop offset="45%" stop-color="#ffffff" stop-opacity="0.12"/>
-      <stop offset="100%" stop-color="#c084fc" stop-opacity="0.25"/>
-    </linearGradient>
-
-    <!-- Inner Radial Lighting for High-End Glass Look -->
-    <radialGradient id="innerGlow" cx="35%" cy="30%" r="70%">
-      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.25"/>
-      <stop offset="65%" stop-color="#ffffff" stop-opacity="0"/>
-    </radialGradient>
-
-    <!-- Emerald Dynamic Dial Needle Gradient -->
-    <linearGradient id="emeraldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+    <!-- Emerald-to-Cyan Active Flow -->
+    <linearGradient id="neonEmerald" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#34d399"/>
-      <stop offset="100%" stop-color="#059669"/>
+      <stop offset="60%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#06b6d4"/>
     </linearGradient>
 
-    <!-- Precision Meter Arc Gradient -->
-    <linearGradient id="trackGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/>
-      <stop offset="70%" stop-color="#6ee7b7" stop-opacity="0.95"/>
-      <stop offset="100%" stop-color="#34d399" stop-opacity="1"/>
+    <!-- Beveled Dual Glass Rim -->
+    <linearGradient id="glassRim" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.65"/>
+      <stop offset="35%" stop-color="#ffffff" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#c084fc" stop-opacity="0.35"/>
     </linearGradient>
 
-    <!-- Outer Drop Shadow -->
-    <filter id="iconShadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#4338ca" flood-opacity="0.55"/>
-      <feDropShadow dx="0" dy="1" stdDeviation="2" flood-color="#000000" flood-opacity="0.3"/>
+    <!-- Specular Sheen Gradient -->
+    <linearGradient id="sheenGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+
+    <!-- Deep Ambient Glow Filter -->
+    <filter id="deepGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="7" stdDeviation="6" flood-color="#4338ca" flood-opacity="0.6"/>
+      <feDropShadow dx="0" dy="1" stdDeviation="2" flood-color="#000000" flood-opacity="0.4"/>
     </filter>
   </defs>
 
-  <!-- iOS-Style Curvature Squircle Base -->
-  <rect x="4" y="4" width="120" height="120" rx="30" fill="url(#bgGrad)" filter="url(#iconShadow)"/>
-  
-  <!-- Subtle Internal Radial Depth -->
-  <rect x="4" y="4" width="120" height="120" rx="30" fill="url(#innerGlow)"/>
-  
-  <!-- Polished Outer Glass Rim -->
-  <rect x="4" y="4" width="120" height="120" rx="30" fill="none" stroke="url(#rimGrad)" stroke-width="2.5"/>
+  <!-- iOS-Style Squircle Base -->
+  <rect x="4" y="4" width="120" height="120" rx="30" fill="url(#cyberGrad)" filter="url(#deepGlow)"/>
 
-  <!-- Meter Gauge Inactive Baseline Track -->
-  <circle cx="64" cy="64" r="38" fill="none" stroke="#ffffff" stroke-opacity="0.18" stroke-width="8"/>
+  <!-- Top Glass Curved Specular Sheen -->
+  <path d="M 4 34 Q 64 68 124 34 L 124 34 A 30 30 0 0 0 94 4 L 34 4 A 30 30 0 0 0 4 34 Z" fill="url(#sheenGrad)"/>
 
-  <!-- Active Metering Velocity Arc (~280 degrees sweep) -->
-  <path d="M 64 26 A 38 38 0 1 1 35.8 89.6" fill="none" stroke="url(#trackGrad)" stroke-width="8" stroke-linecap="round"/>
+  <!-- Chamfered Beveled Glass Rim -->
+  <rect x="4" y="4" width="120" height="120" rx="30" fill="none" stroke="url(#glassRim)" stroke-width="2.2"/>
 
-  <!-- Leading Calibrated Indicator Pip -->
-  <circle cx="64" cy="26" r="6" fill="#34d399"/>
-  <circle cx="64" cy="26" r="3" fill="#ffffff"/>
+  <!-- Dark Obsidian Inner Dial Lens -->
+  <circle cx="64" cy="64" r="41" fill="#080c1c" fill-opacity="0.75" stroke="#ffffff" stroke-opacity="0.12" stroke-width="1.2"/>
 
-  <!-- Hour Hand: Precision Engineered Vertical White Bar -->
-  <line x1="64" y1="64" x2="64" y2="40" stroke="#ffffff" stroke-width="8" stroke-linecap="round"/>
+  <!-- Calibration Tick Marks (Hour Positions) -->
+  <g stroke="#ffffff" stroke-linecap="round">
+    <line x1="64" y1="25" x2="64" y2="29" stroke-width="2" stroke-opacity="0.8"/>
+    <line x1="103" y1="64" x2="99" y2="64" stroke-width="2" stroke-opacity="0.8"/>
+    <line x1="64" y1="103" x2="64" y2="99" stroke-width="2" stroke-opacity="0.8"/>
+    <line x1="25" y1="64" x2="29" y2="64" stroke-width="2" stroke-opacity="0.8"/>
+    
+    <line x1="83.5" y1="30.5" x2="81" y2="34.8" stroke-width="1.2" stroke-opacity="0.4"/>
+    <line x1="97.5" y1="44.5" x2="93.2" y2="47" stroke-width="1.2" stroke-opacity="0.4"/>
+    <line x1="97.5" y1="83.5" x2="93.2" y2="81" stroke-width="1.2" stroke-opacity="0.4"/>
+    <line x1="83.5" y1="97.5" x2="81" y2="93.2" stroke-width="1.2" stroke-opacity="0.4"/>
+    <line x1="44.5" y1="97.5" x2="47" y2="93.2" stroke-width="1.2" stroke-opacity="0.4"/>
+    <line x1="30.5" y1="83.5" x2="34.8" y2="81" stroke-width="1.2" stroke-opacity="0.4"/>
+    <line x1="30.5" y1="44.5" x2="34.8" y2="47" stroke-width="1.2" stroke-opacity="0.4"/>
+    <line x1="44.5" y1="30.5" x2="47" y2="34.8" stroke-width="1.2" stroke-opacity="0.4"/>
+  </g>
 
-  <!-- Minute / Value Hand: Bold Billable Accent pointing dynamically -->
-  <line x1="64" y1="64" x2="85" y2="75" stroke="url(#emeraldGrad)" stroke-width="7" stroke-linecap="round"/>
+  <!-- Inactive Dial Track Halo -->
+  <circle cx="64" cy="64" r="32" fill="none" stroke="#ffffff" stroke-opacity="0.16" stroke-width="7"/>
 
-  <!-- Center Pivot Core -->
-  <circle cx="64" cy="64" r="8" fill="#ffffff"/>
-  <circle cx="64" cy="64" r="3.5" fill="#4f46e5"/>
+  <!-- High-Torque Emerald Velocity Arc (~290 deg) -->
+  <path d="M 64 32 A 32 32 0 1 1 39.5 84.5" fill="none" stroke="url(#neonEmerald)" stroke-width="7" stroke-linecap="round"/>
+
+  <!-- Origin / Pulse Pip at 12 o'clock -->
+  <circle cx="64" cy="32" r="5" fill="#34d399"/>
+  <circle cx="64" cy="32" r="2.5" fill="#ffffff"/>
+
+  <!-- Clock Hour Hand (Sculpted White Bar) -->
+  <line x1="64" y1="64" x2="64" y2="44" stroke="#000000" stroke-opacity="0.3" stroke-width="7" stroke-linecap="round" transform="translate(0, 1.5)"/>
+  <line x1="64" y1="64" x2="64" y2="44" stroke="#ffffff" stroke-width="6.5" stroke-linecap="round"/>
+
+  <!-- Clock Minute Hand (Dynamic Emerald Billable Needle) -->
+  <line x1="64" y1="64" x2="84.5" y2="74.5" stroke="#000000" stroke-opacity="0.3" stroke-width="6" stroke-linecap="round" transform="translate(0, 1.5)"/>
+  <line x1="64" y1="64" x2="84.5" y2="74.5" stroke="url(#neonEmerald)" stroke-width="5.5" stroke-linecap="round"/>
+
+  <!-- Multi-Tier Precision Chronograph Pivot Hub -->
+  <circle cx="64" cy="64" r="7.5" fill="#000000" fill-opacity="0.3" transform="translate(0, 1)"/>
+  <circle cx="64" cy="64" r="7" fill="#ffffff"/>
+  <circle cx="64" cy="64" r="4" fill="#10b981"/>
+  <circle cx="64" cy="64" r="1.8" fill="#0f172a"/>
 </svg>
