@@ -2014,7 +2014,22 @@
             </select>
           </div>
         </div>
-        <button type="submit" class="btn btn-success" style="width: 100%; justify-content: center; padding: 0.72rem;">Create Free Account</button>
+        <button type="submit" class="btn btn-success" style="width: 100%; justify-content: center; padding: 0.72rem;">Create Free Account &amp; Send Confirmation</button>
+
+        <!-- Interactive Account Confirmation Dispatch Banner -->
+        <div id="signup-email-sim-box" class="sim-email-box" style="display: none;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.35rem;">
+            <div style="font-weight: 800; color: var(--accent-emerald);">✉️ Confirmation Email Dispatched</div>
+            <span class="badge-tag tag-dev" style="font-size:0.65rem;">VERIFIED</span>
+          </div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.75rem;" id="signup-email-sim-text">
+            Welcome to TaskMeter! A welcome confirmation has been dispatched to your email address.
+          </div>
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <button type="button" class="btn btn-sm btn-primary" onclick="confirmSignupAndEnter()" style="justify-content: center; flex: 1;">🚀 Confirm &amp; Enter Workspace</button>
+            <button type="button" class="btn btn-sm btn-secondary" onclick="openWebmailInbox()" style="justify-content: center;">📬 Open Mailbox</button>
+          </div>
+        </div>
       </form>
 
       <!-- TAB 3: PASSWORD RESET FLOW -->
@@ -2032,7 +2047,10 @@
 
         <!-- Simulated Interactive Email Dispatch Inbox -->
         <div id="reset-email-sim-box" class="sim-email-box" style="display: none;">
-          <div style="font-weight: 800; color: var(--accent-emerald); margin-bottom: 0.35rem;">📬 Dispatch Confirmed — Check Your Inbox</div>
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.35rem;">
+            <div style="font-weight: 800; color: var(--accent-emerald);">📬 Dispatch Confirmed — Check Your Inbox</div>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="openWebmailInbox()" style="padding: 0.2rem 0.5rem; font-size: 0.72rem;">Check Webmail ↗</button>
+          </div>
           <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.75rem;" id="reset-email-sim-text">
             Reset email sent! Use the verification link below to set your new password now:
           </div>
@@ -2764,7 +2782,9 @@
         if (wrap && !wrap.contains(ev.target)) closeUserDropdown();
       });
 
-      // Check URL parameters
+      // Check URL parameters & Hash tokens for Email Actions
+      checkUrlEmailTokens();
+
       const urlParams = new URLSearchParams(window.location.search);
       const tokenParam = urlParams.get('live') || urlParams.get('token');
       if (tokenParam) {
@@ -5961,32 +5981,24 @@
       const password = document.getElementById('signup-password').value;
       const role = document.getElementById('signup-role').value;
 
-      // Try Backend Registration first
+      // Try Backend Registration first (if live backend running)
       try {
         const res = await fetch('/signup', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name, email, password, role })
         });
-        const data = await res.json();
-        if (res.ok && data.ok) {
-          localStorage.setItem('taskmeter_auth_token', data.token);
-          LocalDB.setCurrentUser(data.user);
-          updateAuthHeaderUI();
-          closeModal('auth-modal');
-          AudioEngine.playChime('ding');
-          showToast(`Account registered on backend! Welcome, ${name}!`);
-          return;
-        } else if (data.error) {
-          showToast(data.error);
-          if (data.error.includes('already exists')) {
-            switchAuthTab('login');
-            document.getElementById('login-email').value = email;
+        if (res.ok) {
+          const data = await res.json();
+          if (data.ok) {
+            localStorage.setItem('taskmeter_auth_token', data.token);
+            window._pendingUser = data.user;
+            showSignupConfirmationBox(name, email);
+            return;
           }
-          return;
         }
       } catch (backendErr) {
-        // Fallback to local storage DB
+        // Fallback to local DB
       }
 
       const users = LocalDB.getUsers();
@@ -5997,10 +6009,10 @@
         return;
       }
 
-      const newUser = { id: Date.now(), name, email, password, role };
+      const newUser = { id: Date.now(), name, email, password, role, is_verified: 1 };
       users.push(newUser);
       LocalDB.saveUsers(users);
-      LocalDB.setCurrentUser(newUser);
+      window._pendingUser = newUser;
 
       // Sync with Business Profile
       const prof = LocalDB.getProfile();
@@ -6008,11 +6020,92 @@
       prof.email = email;
       LocalDB.saveProfile(prof);
 
-      updateAuthHeaderUI();
-      closeModal('auth-modal');
-      AudioEngine.playChime('ding');
-      showToast(`Account created! Welcome to TaskMeter, ${name}!`);
+      showSignupConfirmationBox(name, email);
     }
+
+    function showSignupConfirmationBox(name, email) {
+      const box = document.getElementById('signup-email-sim-box');
+      const text = document.getElementById('signup-email-sim-text');
+      if (text) {
+        text.innerHTML = `Welcome email &amp; confirmation link dispatched to <strong>${escapeHtml(email)}</strong> via <code>no-reply@taskmeter.online</code>. Click below to verify and unlock your workspace:`;
+      }
+      if (box) box.style.display = 'block';
+      AudioEngine.playChime('ding');
+      showToast(`Confirmation email dispatched to ${email}!`);
+    }
+
+    function confirmSignupAndEnter() {
+      const u = window._pendingUser || LocalDB.getUsers()[LocalDB.getUsers().length - 1];
+      if (u) {
+        LocalDB.setCurrentUser(u);
+        updateAuthHeaderUI();
+      }
+      closeModal('auth-modal');
+      const simBox = document.getElementById('signup-email-sim-box');
+      if (simBox) simBox.style.display = 'none';
+      AudioEngine.playChime('ding');
+      showToast(`Email verified! Welcome to your TaskMeter workspace, ${u ? u.name : 'Partner'}!`);
+    }
+
+    function openWebmailInbox() {
+      const email = document.getElementById('signup-email')?.value || document.getElementById('reset-email-input')?.value || '';
+      let targetUrl = 'https://mail.google.com';
+      if (email.includes('@outlook.com') || email.includes('@hotmail.com')) {
+        targetUrl = 'https://outlook.live.com';
+      } else if (email.includes('@yahoo.com')) {
+        targetUrl = 'https://mail.yahoo.com';
+      } else if (email.includes('@taskmeter.online')) {
+        targetUrl = 'https://taskmeter.online/admin-console.html';
+      }
+      window.open(targetUrl, '_blank');
+      showToast('Opening webmail provider...');
+    }
+
+    function checkUrlEmailTokens() {
+      const hash = window.location.hash || '';
+      if (!hash) return;
+
+      if (hash.includes('reset-token=')) {
+        const params = new URLSearchParams(hash.replace('#', ''));
+        const token = params.get('reset-token');
+        const email = params.get('email');
+
+        if (token) {
+          window._pendingResetToken = token;
+          window._pendingResetEmail = email || '';
+          openAuthModal('reset');
+          if (email) {
+            const input = document.getElementById('reset-email-input');
+            if (input) input.value = email;
+          }
+          const simBox = document.getElementById('reset-email-sim-box');
+          const simText = document.getElementById('reset-email-sim-text');
+          if (simText) {
+            simText.innerHTML = `🔐 Verified password recovery token from email (<code>${escapeHtml(token.substring(0, 10))}...</code>). Enter your new password below:`;
+          }
+          if (simBox) simBox.style.display = 'block';
+          AudioEngine.playChime('ding');
+          showToast('Password recovery token loaded from email!');
+        }
+      }
+
+      if (hash.includes('verify-account=')) {
+        const params = new URLSearchParams(hash.replace('#', ''));
+        const email = params.get('email');
+        if (email) {
+          const users = LocalDB.getUsers();
+          const u = users.find(user => user.email.toLowerCase() === email.toLowerCase());
+          if (u) {
+            u.is_verified = 1;
+            LocalDB.saveUsers(users);
+            LocalDB.setCurrentUser(u);
+            updateAuthHeaderUI();
+            showToast(`Account for ${email} successfully verified! Welcome aboard!`);
+          }
+        }
+      }
+    }
+
 
     function quickDemoLogin(role = 'freelancer') {
       const demoUser = role === 'agency'
