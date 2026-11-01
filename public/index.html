@@ -456,7 +456,7 @@
     /* Printable Invoice */
     @media print {
       body { background: #fff !important; color: #000 !important; padding: 0 !important; }
-      header, .top-banner, .global-timer-dock, .nav-tabs, .btn, .modal-header .close-btn, .no-print, .quick-track-bar { display: none !important; }
+      header, .top-banner, .global-timer-dock, .nav-tabs, .btn, .modal-header .close-btn, .no-print, .quick-track-bar, .site-footer, .toast { display: none !important; }
       .modal-overlay { position: static !important; background: transparent !important; display: block !important; }
       .modal { max-width: 100% !important; border: none !important; box-shadow: none !important; padding: 0 !important; }
       td, th { color: #000 !important; border-color: #ddd !important; }
@@ -2389,7 +2389,7 @@
   </div>
 
   <!-- Toast Notification -->
-  <div class="toast" id="toast">Notification</div>
+  <div class="toast" id="toast"></div>
 
   <script>
     let projectsData = [];
