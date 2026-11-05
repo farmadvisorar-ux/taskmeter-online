@@ -1,0 +1,26 @@
+{
+  "name": "TaskMeter Pro Studio — Freelance Time Clock & Client Billing",
+  "short_name": "TaskMeter Pro",
+  "description": "Precision freelance time tracking, live per-second earnings ticker, weekly timesheet matrix, client billing stream, executive analytics, and instant PDF invoice & SOW generator.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#07090e",
+  "theme_color": "#00e5a0",
+  "orientation": "any",
+  "categories": ["productivity", "finance", "business", "utilities"],
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo-240x240.jpg",
+      "sizes": "240x240",
+      "type": "image/jpeg",
+      "purpose": "any"
+    }
+  ]
+}

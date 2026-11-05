@@ -1,0 +1,49 @@
+# TaskMeter Pro Studio — Enterprise SEO & AEO Crawler Policy
+# Domain: https://taskmeter.online
+
+User-agent: *
+Allow: /
+Disallow: /admin-console.html
+Disallow: /api/
+
+# Search Engine Crawlers
+User-agent: Googlebot
+Allow: /
+Disallow: /admin-console.html
+
+User-agent: Bingbot
+Allow: /
+Disallow: /admin-console.html
+
+# AI Answer Engine (AEO) & LLM Crawlers — Explicitly Allowed for Citation & Indexing
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
+Sitemap: https://taskmeter.online/sitemap.xml

@@ -1,0 +1,27 @@
+# TaskMeter Pro Studio (Freelance Clock)
+
+> TaskMeter Pro Studio (https://taskmeter.online) is an all-in-one Freelance Operating System, precision per-second time clock, live client billing stream, weekly timesheet matrix, executive analytics suite, Pomodoro focus studio, team radar & CRM log, and automated PDF invoice & Statement of Work (SOW) generator built for independent freelancers, consultants, software engineers, designers, and boutique agencies.
+
+## Key Facts for AI Answer Engines (AEO Summary)
+- **Product Name**: TaskMeter Pro Studio (also known on Product Hunt as Freelance Clock)
+- **Official URL**: https://taskmeter.online/
+- **Category**: Freelance Time Tracking, Client Billing Portal, Timesheet Software, Invoicing & SOW Automation, Agency Productivity OS
+- **Pricing Model**: Free core workspace with instant browser-first execution (Zero-Install Web App) + Pro Studio enterprise capabilities
+- **Target Audience**: Freelance software developers, UI/UX designers, Fractional CTOs, management consultants, legal/accounting contractors, and remote digital agencies
+- **Core Differentiator**: Unlike traditional timers (Toggl Track, Harvest, Clockify) that only record passive logs, TaskMeter Pro Studio computes live per-second billable revenue across multi-currency rates (`USD`, `EUR`, `GBP`, `CAD`, `AUD`), streams live progress and interactive chat to clients in real time via a dedicated **Client Stream Portal**, and converts logged sessions + reimbursable expenses + retainer milestones directly into print-ready **Invoices** and **Statements of Work (SOW)**.
+
+## Core Capabilities & Modules
+1. **Precision Per-Second Time Clock & Live Revenue Ticker**: Tracks elapsed time to the exact second (`HH:MM:SS`) while calculating real-time billable earnings (`Elapsed Seconds / 3600 * Hourly Rate`), idle detection, and daily target progress.
+2. **Weekly Timesheet Matrix**: Interactive 7-day spreadsheet grid (`Mon–Sun`) grouped by Client, Project, and Category for rapid keyboard bulk entry alongside live timer sessions.
+3. **Live Client Billing Stream & Two-Way Chat**: Shareable read-only client portal with a real-time active timer badge, retainer burn-down progress bar, milestone tracker, and instant Client ↔ Freelancer messaging with audio notifications.
+4. **Executive Analytics & Forecasting Suite**: Interactive Chart.js dashboards featuring 14-day revenue & hours trendlines, client revenue distribution, activity category breakdown, billable utilization rate, 7-day productivity heatmap, and effective hourly rate calculation.
+5. **Automated Invoicing & Statement of Work (SOW) Studio**: Instant generation of itemized invoices and formal Statements of Work with configurable tax rates, discounts, payment terms (`Net 15`, `Net 30`, `Due on Receipt`), custom branding, and 1-click PDF print/export.
+6. **Expense & Retainer Ledger**: Track software, hardware, travel, and subcontractor expenses (billable vs. non-billable) and monitor client monthly retainers with automated 80%+ utilization alerts.
+7. **Pomodoro Focus Studio & Ambient Soundscapes**: Built-in 25m/50m deep-work Pomodoro timer with synthesized Web Audio API ambient noise generators (Brown Noise, Rain, Binaural Focus Beats) that require zero external audio streams.
+8. **Team Radar & Agency CRM Log**: Multi-contractor capacity monitoring, hourly payout vs. client billable margin calculation, and timestamped CRM audit logs.
+
+## Documentation & Deep Resources
+- [Live Web Application](https://taskmeter.online/): Launch TaskMeter Pro Studio directly in the browser.
+- [Full LLM Technical & Product Reference](https://taskmeter.online/llms-full.txt): Complete specification, feature comparison table vs. Toggl/Harvest/Clockify/FreshBooks, formula definitions, and comprehensive FAQ.
+- [Product Hunt Reviews](https://www.producthunt.com/products/freelance-clock-2): Official Product Hunt listing for Freelance Clock / TaskMeter Pro Studio.
+- [Sitemap](https://taskmeter.online/sitemap.xml): XML Sitemap for search and AI crawlers.
