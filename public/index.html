@@ -3308,6 +3308,13 @@
       // 1-Second Live Master Ticker
       setInterval(updateLiveMasterTicker, 1000);
 
+      // Register PWA Service Worker for offline desktop installability
+      if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
+        navigator.serviceWorker.register('/sw.js').catch(err => {
+          console.warn('SW registration skipped:', err);
+        });
+      }
+
       // Desktop Electron Integration (Global Shortcuts, Tray & Native Notifications)
       if (window.electronAPI) {
         window.electronAPI.onToggleTimer(() => {
