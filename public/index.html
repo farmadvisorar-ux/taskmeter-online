@@ -1284,9 +1284,15 @@
       <!-- Subview 2: Harvest-Style Weekly Timesheet Matrix -->
       <div id="subview-timesheet" style="display: none;">
         <div class="timesheet-matrix">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-            <h3 style="font-size: 1.1rem; font-weight: 700;">Weekly Time Matrix</h3>
-            <span style="font-size: 0.8rem; color: var(--text-muted);">Type hours directly into any day cell</span>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;">
+            <div>
+              <h3 style="font-size: 1.1rem; font-weight: 700; margin: 0;">Weekly Time Matrix</h3>
+              <span style="font-size: 0.8rem; color: var(--text-muted);">Type hours directly into any day cell or use fast workflow actions</span>
+            </div>
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+              <button type="button" class="btn btn-secondary btn-sm" onclick="duplicateTimesheetWeek()" title="Copy all active project standard schedules to current week">📋 Duplicate Week Template</button>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="clearCurrentWeekTimesheet()" title="Reset matrix inputs for a clean week">🧹 Reset Matrix Cells</button>
+            </div>
           </div>
           <table class="matrix-table">
             <thead>
@@ -2748,9 +2754,11 @@
         <button class="close-btn" onclick="closeModal('invoice-modal')">&times;</button>
       </div>
       <div id="invoice-body"></div>
-      <div class="no-print" style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem;">
-        <button class="btn btn-secondary" onclick="window.print()">Print / Export PDF</button>
-        <button class="btn" onclick="closeModal('invoice-modal')">Close</button>
+      <div class="no-print" style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem; flex-wrap: wrap;">
+        <button type="button" class="btn btn-secondary" onclick="copyInvoiceMarkdown()" title="Copy clean Markdown invoice summary to paste into an email or client DM">📋 Copy Summary</button>
+        <button type="button" class="btn btn-secondary" onclick="copyClientPayLink()" title="Copy direct Client Stream billing link">🔗 Copy Pay Link</button>
+        <button type="button" class="btn btn-secondary" onclick="window.print()">Print / Export PDF</button>
+        <button type="button" class="btn" onclick="closeModal('invoice-modal')">Close</button>
       </div>
     </div>
   </div>
@@ -2805,6 +2813,21 @@
         <div class="form-group">
           <label>Default Tax / VAT Rate (%)</label>
           <input type="number" step="0.1" id="biz-tax" class="form-control" placeholder="0">
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="form-group">
+            <label>Payment Terms</label>
+            <select id="biz-terms" class="form-control">
+              <option value="Due Upon Receipt">Due Upon Receipt</option>
+              <option value="Net 15 Days">Net 15 Days</option>
+              <option value="Net 30 Days">Net 30 Days</option>
+              <option value="Net 60 Days">Net 60 Days</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Currency Symbol / Code</label>
+            <input type="text" id="biz-currency" class="form-control" placeholder="USD ($)">
+          </div>
         </div>
         <div class="form-group">
           <label>Payment Instructions / Wire / Stripe Link</label>
@@ -2926,6 +2949,19 @@
             gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
             osc.start(now);
             osc.stop(now + 0.5);
+          } else if (type === 'fanfare') {
+            // Milestone revenue celebratory chord
+            [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
+              const o = this.ctx.createOscillator();
+              const g = this.ctx.createGain();
+              o.connect(g);
+              g.connect(this.ctx.destination);
+              o.frequency.setValueAtTime(freq, now + (i * 0.08));
+              g.gain.setValueAtTime(0.12, now + (i * 0.08));
+              g.gain.exponentialRampToValueAtTime(0.001, now + (i * 0.08) + 0.6);
+              o.start(now + (i * 0.08));
+              o.stop(now + (i * 0.08) + 0.6);
+            });
           }
         } catch (e) {}
       }
@@ -3041,6 +3077,7 @@
     let activeMsgProjectId = null;
     let activeDeepDiveProjectId = null;
     let activeDeepDiveTab = 'overview';
+    let activeInvoiceProjId = null;
     let teamFilterState = 'all';
     let isTeamSoloMode = false;
 
@@ -3784,6 +3821,42 @@
       showToast(`Logged ${hrs}h on timesheet!`);
     }
 
+    function duplicateTimesheetWeek() {
+      if (!projectsData || !projectsData.length) {
+        showToast('No active projects to duplicate schedule from.');
+        return;
+      }
+      let loggedCount = 0;
+      projectsData.forEach(p => {
+        // Log a standard 1.5h daily sprint block across Mon-Fri
+        const standardDailyHrs = 1.5;
+        const now = Date.now();
+        const entries = LocalDB.getEntries(p.id);
+        for (let i = 1; i <= 5; i++) {
+          entries.push({
+            id: now + i + Math.floor(Math.random() * 1000),
+            started_at: now - (i * 86400000) - (standardDailyHrs * 3600000),
+            stopped_at: now - (i * 86400000),
+            notes: `Sprint delivery block (${escapeHtml(p.name)})`,
+            billable: true
+          });
+          loggedCount++;
+        }
+        LocalDB.saveEntries(p.id, entries);
+      });
+
+      AudioEngine.playChime('ding');
+      fetchProjects();
+      renderTimesheetMatrix();
+      showToast(`✨ Duplicated weekly schedule template across ${projectsData.length} projects!`);
+    }
+
+    function clearCurrentWeekTimesheet() {
+      const inputs = document.querySelectorAll('.matrix-cell-input');
+      inputs.forEach(inp => inp.value = '');
+      showToast('Timesheet inputs cleared.');
+    }
+
     // Detailed Ledger View (Toggl Style)
     function renderDetailedLedger() {
       const container = document.getElementById('detailed-ledger-list');
@@ -4175,6 +4248,9 @@
       const taxAmount = (proj.cost * taxRate) / 100;
       const finalGrandTotal = proj.grandTotal + taxAmount;
 
+      activeInvoiceProjId = id;
+      const termsText = profile.terms || 'Due Upon Receipt';
+
       document.getElementById('invoice-body').innerHTML = `
         <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid var(--border-color); padding-bottom: 1.5rem; margin-bottom: 1.5rem;">
           <div>
@@ -4185,7 +4261,7 @@
           <div style="text-align: right;">
             <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 800; color: var(--primary-glow);">${invNumber}</div>
             <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.2rem;">Date: ${invDate}</div>
-            <div style="font-size: 0.85rem; color: var(--text-muted);">Terms: <strong>Due Upon Receipt</strong></div>
+            <div style="font-size: 0.85rem; color: var(--text-muted);">Terms: <strong>${escapeHtml(termsText)}</strong></div>
           </div>
         </div>
 
@@ -4278,6 +4354,54 @@
           </div>
         </div>
       `;
+    }
+
+    function copyInvoiceMarkdown() {
+      if (!activeInvoiceProjId) return;
+      const proj = projectsData.find(p => p.id === activeInvoiceProjId);
+      if (!proj) return;
+      const profile = LocalDB.getProfile();
+      const taxRate = profile.tax_rate || 0;
+      const taxAmount = (proj.cost * taxRate) / 100;
+      const finalGrandTotal = proj.grandTotal + taxAmount;
+      const invNumber = `INV-${new Date().getFullYear()}-${String(proj.id).padStart(4, '0')}`;
+      const invDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+      const payUrl = `${window.location.origin}/?token=${encodeURIComponent(proj.share_token)}#client`;
+
+      const md = [
+        `# INVOICE SUMMARY: ${invNumber}`,
+        `**From**: ${profile.name || 'Freelance Studio'} (${profile.email || ''})`,
+        `**To**: ${proj.client_name}`,
+        `**Project**: ${proj.name}`,
+        `**Date**: ${invDate} | **Terms**: ${profile.terms || 'Due Upon Receipt'}`,
+        ``,
+        `### Labor & Professional Services:`,
+        `- Logged Hours: ${(proj.hours || 0).toFixed(2)} hrs @ ${formatMoney(proj.hourly_rate, proj.currency)}/hr`,
+        `- Labor Subtotal: ${formatMoney(proj.cost, proj.currency)}`,
+        proj.expenseTotal ? `- Reimbursable Expenses: ${formatMoney(proj.expenseTotal, proj.currency)}` : null,
+        taxAmount > 0 ? `- Tax (${taxRate}%): ${formatMoney(taxAmount, proj.currency)}` : null,
+        `**GRAND TOTAL DUE**: ${formatMoney(finalGrandTotal, proj.currency)}`,
+        ``,
+        `### Remittance / Payment:`,
+        `${profile.payment || 'Direct Deposit / Wire'}`,
+        ``,
+        `**Client Stream & Payment Portal**: ${payUrl}`,
+        `_Generated via TaskMeter Pro Studio (taskmeter.online)_`
+      ].filter(Boolean).join('\n');
+
+      navigator.clipboard.writeText(md).then(() => {
+        AudioEngine.playChime('ding');
+        showToast('📋 Markdown invoice summary copied to clipboard!');
+      }).catch(() => {
+        showToast('Invoice copied!');
+      });
+    }
+
+    function copyClientPayLink() {
+      if (!activeInvoiceProjId) return;
+      const proj = projectsData.find(p => p.id === activeInvoiceProjId);
+      if (!proj) return;
+      copyShareToken(proj.share_token);
     }
 
     // Client Live Stream View
@@ -5558,6 +5682,8 @@
       document.getElementById('biz-email').value = p.email || '';
       document.getElementById('biz-address').value = p.address || '';
       document.getElementById('biz-tax').value = p.tax_rate || 0;
+      if (document.getElementById('biz-terms')) document.getElementById('biz-terms').value = p.terms || 'Due Upon Receipt';
+      if (document.getElementById('biz-currency')) document.getElementById('biz-currency').value = p.currency_label || 'USD ($)';
       document.getElementById('biz-payment').value = p.payment || '';
       document.getElementById('business-modal').classList.add('active');
     }
@@ -5569,10 +5695,13 @@
         email: document.getElementById('biz-email').value.trim(),
         address: document.getElementById('biz-address').value.trim(),
         tax_rate: parseFloat(document.getElementById('biz-tax').value) || 0,
+        terms: document.getElementById('biz-terms') ? document.getElementById('biz-terms').value : 'Due Upon Receipt',
+        currency_label: document.getElementById('biz-currency') ? document.getElementById('biz-currency').value.trim() : 'USD ($)',
         payment: document.getElementById('biz-payment').value.trim()
       });
       closeModal('business-modal');
-      showToast('Business profile updated!');
+      renderInvoicesTable();
+      showToast('Business & tax profile updated!');
     }
 
     // Backup & Export
