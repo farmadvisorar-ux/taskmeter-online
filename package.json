@@ -5,7 +5,9 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js"
+    "dev": "node server.js",
+    "desktop": "electron main.js",
+    "desktop:pack": "electron-builder --win --dir"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -17,5 +19,8 @@
   },
   "engines": {
     "node": ">=18.0.0"
+  },
+  "devDependencies": {
+    "electron": "^45.2.3"
   }
 }

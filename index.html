@@ -3307,6 +3307,29 @@
 
       // 1-Second Live Master Ticker
       setInterval(updateLiveMasterTicker, 1000);
+
+      // Desktop Electron Integration (Global Shortcuts, Tray & Native Notifications)
+      if (window.electronAPI) {
+        window.electronAPI.onToggleTimer(() => {
+          const running = projectsData.find(p => p.running);
+          if (running) {
+            stopActiveGlobalTimer();
+            if (window.electronAPI.updateTrayTitle) window.electronAPI.updateTrayTitle('Timer Paused');
+          } else if (projectsData.length > 0) {
+            startClock(projectsData[0].id, 'Desktop Shortcut Session');
+            if (window.electronAPI.updateTrayTitle) window.electronAPI.updateTrayTitle(`Running: ${projectsData[0].name}`);
+          }
+        });
+
+        window.electronAPI.onSwitchView((targetView) => {
+          switchView(targetView);
+        });
+
+        const badge = document.createElement('div');
+        badge.style.cssText = 'position:fixed;bottom:12px;right:12px;background:rgba(0,229,160,0.15);color:#00e5a0;border:1px solid rgba(0,229,160,0.3);border-radius:20px;padding:4px 10px;font-size:0.7rem;font-weight:700;z-index:9999;backdrop-filter:blur(6px);pointer-events:none;';
+        badge.innerHTML = '⚡ Desktop Mode Active (Ctrl+Alt+Space to Toggle Timer)';
+        document.body.appendChild(badge);
+      }
     });
 
     function handleGlobalKeydown(e) {
